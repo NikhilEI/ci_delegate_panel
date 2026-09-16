@@ -42,8 +42,8 @@ export default function AdminNavbar({ adminName, adminEmail, onToggleMenu, onTog
         </a>
       </div>
 
-      <div className="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <div className="navbar-nav align-items-center">
+      <div className="navbar-nav-right d-flex align-items-center" id="navbar-collapse" style={{ minWidth: 0, flex: 1 }}>
+        <div className="navbar-nav align-items-center" style={{ minWidth: 0, overflow: "hidden" }}>
           <a
             href="#"
             className="nav-item nav-link px-0 me-3 d-none d-xl-block"
@@ -55,10 +55,10 @@ export default function AdminNavbar({ adminName, adminEmail, onToggleMenu, onTog
           >
             <i className="bx bx-menu bx-sm"></i>
           </a>
-          <span className="fw-semibold">Convergence India - Registrations &amp; Payments</span>
+          <span className="fw-semibold d-none d-md-inline-block text-truncate">Registrations &amp; Payments</span>
         </div>
 
-        <ul className="navbar-nav flex-row align-items-center ms-auto">
+        <ul className="navbar-nav flex-row align-items-center ms-auto" style={{ flexShrink: 0 }}>
           <li className={`nav-item navbar-dropdown dropdown-user dropdown${menuOpen ? " show" : ""}`} ref={wrapperRef}>
             <a
               className="nav-link dropdown-toggle hide-arrow d-flex align-items-center gap-2"

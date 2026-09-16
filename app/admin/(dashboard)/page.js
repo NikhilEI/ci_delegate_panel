@@ -112,7 +112,7 @@ export default function AdminDashboardPage() {
         <StatCard icon="bx-id-card" iconBg="#0ea472" label="Delegate registrations" value={totals.registrationCount || 0} sub={`${totals.delegateCount || 0} delegates`} />
         <StatCard icon="bx-check-shield" iconBg="#28a745" label="Revenue collected" value={formatCurrency(totals.revenuePaid)} sub={`${totals.paidCount || 0} paid`} />
         <StatCard icon="bx-time-five" iconBg="#f0ad4e" label="Pending amount" value={formatCurrency(totals.revenuePending)} sub={`${totals.pendingCount || 0} pending`} />
-        <StatCard icon="bx-user-check" iconBg="#0dcaf0" label="Visitor registrations" value={data.visitorTotals?.[0]?.visitorCount || 0} sub={`${totals.failedCount || 0} payments failed`} />
+        <StatCard icon="bx-user-check" iconBg="#0dcaf0" label="Visitor registrations" value={data.visitorTotals?.visitorCount || 0} sub={`${totals.failedCount || 0} payments failed`} />
       </div>
 
       <div className="row">

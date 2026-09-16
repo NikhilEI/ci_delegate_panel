@@ -9,6 +9,7 @@ const navItems = [
   { href: "/admin/registrations", label: "Delegate Registrations", icon: "bx-id-card" },
   { href: "/admin/visitors", label: "Visitor Registrations", icon: "bx-user-check" },
   { href: "/admin/pass-types", label: "Pass Types", icon: "bx-purchase-tag-alt" },
+  { href: "/admin/promo-codes", label: "Promo Codes", icon: "bx-gift" },
 ];
 
 function BrandMark() {
@@ -21,7 +22,7 @@ function BrandMark() {
   );
 }
 
-export default function AdminSidebar({ onNavigate }) {
+export default function AdminSidebar({ onNavigate, collapsed }) {
   const pathname = usePathname();
   const menuInnerRef = useRef(null);
   const psRef = useRef(null);
@@ -51,7 +52,7 @@ export default function AdminSidebar({ onNavigate }) {
   }, []);
 
   return (
-    <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme">
+    <aside id="layout-menu" className={`layout-menu menu-vertical menu bg-menu-theme${collapsed ? " menu-collapsed" : ""}`}>
       <div className="app-brand demo">
         <Link href="/admin" className="app-brand-link">
           <BrandMark />

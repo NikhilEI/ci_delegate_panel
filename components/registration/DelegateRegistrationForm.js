@@ -151,7 +151,7 @@ function DelegateBlock({ index, delegate, onChange }) {
   );
 }
 
-export default function DelegateRegistrationForm({ qty, price, passName }) {
+export default function DelegateRegistrationForm({ qty, price, passName, slug, promoCode, discount }) {
   const formRef = useRef(null);
   const [delegates, setDelegates] = useState(() => Array.from({ length: qty }, emptyDelegate));
   const [company, setCompany] = useState({
@@ -199,9 +199,11 @@ export default function DelegateRegistrationForm({ qty, price, passName }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          passSlug: slug,
           passName,
           pricePerDelegate: price,
           quantity: qty,
+          promoCode: promoCode || undefined,
           delegates: delegates.map((delegate) => ({
             ...delegate,
             designation: delegate.designation === "Other" ? delegate.designationOther : delegate.designation,
@@ -278,7 +280,8 @@ export default function DelegateRegistrationForm({ qty, price, passName }) {
     }
   }
 
-  const total = price * qty;
+  const subtotal = price * qty;
+  const total = Math.max(0, subtotal - (discount || 0));
 
   if (submitted) {
     return (
@@ -325,10 +328,25 @@ export default function DelegateRegistrationForm({ qty, price, passName }) {
                       </div>
                       <span className="delegate-pass-title">{passName} Detail</span>
                     </div>
-                    <div className="delegate-pass-right">
-                      <span className="delegate-pass-count">
+                    <div className="delegate-pass-right text-end">
+                      <span className="delegate-pass-count d-block">
                         {qty} {qty === 1 ? "Pass" : "Passes"}
                       </span>
+                      {discount > 0 ? (
+                        <span className="d-block" style={{ fontSize: 14, marginTop: 4 }}>
+                          <span style={{ textDecoration: "line-through", opacity: 0.6 }}>₹ {subtotal.toLocaleString("en-IN")}</span>{" "}
+                          <strong style={{ color: "#166534" }}>₹ {total.toLocaleString("en-IN")}</strong>
+                          {promoCode && (
+                            <span className="d-block" style={{ fontSize: 12, opacity: 0.75 }}>
+                              Promo {promoCode} applied (-₹{discount.toLocaleString("en-IN")})
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="d-block" style={{ fontSize: 14, marginTop: 4 }}>
+                          ₹ {total.toLocaleString("en-IN")}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

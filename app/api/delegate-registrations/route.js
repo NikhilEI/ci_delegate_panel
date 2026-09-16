@@ -1,5 +1,6 @@
-import { getPool } from "@/lib/db";
+import { getPool, query } from "@/lib/db";
 import { getRazorpay } from "@/lib/razorpay";
+import { checkPromoCode } from "@/lib/promoCodes";
 
 const titlePattern = /^.{1,10}$/;
 const emailPattern = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
@@ -9,10 +10,9 @@ function badRequest(message) {
 }
 
 function validatePayload(body) {
-  const { passName, pricePerDelegate, quantity, delegates, company, termsAccepted } = body || {};
+  const { passSlug, quantity, delegates, company, termsAccepted } = body || {};
 
-  if (!passName || typeof passName !== "string") return "passName is required";
-  if (!Number.isFinite(pricePerDelegate) || pricePerDelegate < 0) return "pricePerDelegate is invalid";
+  if (!passSlug || typeof passSlug !== "string") return "passSlug is required";
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 50) return "quantity is invalid";
   if (!Array.isArray(delegates) || delegates.length !== quantity) return "delegates must match quantity";
   if (!termsAccepted) return "Terms and Conditions must be accepted";
@@ -47,9 +47,26 @@ export async function POST(request) {
   const validationError = validatePayload(body);
   if (validationError) return badRequest(validationError);
 
-  const { passName, pricePerDelegate, quantity, delegates, company } = body;
-  // Recompute the total server-side rather than trusting the client.
-  const totalAmount = pricePerDelegate * quantity;
+  const { passSlug, quantity, delegates, company, promoCode } = body;
+
+  // The pass name/price are always re-derived from the DB, never trusted
+  // from the client - the query string that carries them to this page is
+  // plain, user-editable text.
+  const passRows = await query(`SELECT id, name, price FROM pass_types WHERE slug = ? AND is_active = 1 LIMIT 1`, [passSlug]);
+  const passType = passRows[0];
+  if (!passType) return badRequest("This pass is no longer available.");
+
+  const subtotal = passType.price * quantity;
+
+  let discountAmount = 0;
+  let appliedPromoCode = null;
+  if (promoCode) {
+    const promoResult = await checkPromoCode({ code: promoCode, passTypeId: passType.id, subtotal });
+    if (!promoResult.valid) return badRequest(promoResult.message);
+    discountAmount = promoResult.discountAmount;
+    appliedPromoCode = promoResult.code;
+  }
+  const totalAmount = subtotal - discountAmount;
 
   const pool = getPool();
   let connection;
@@ -59,11 +76,11 @@ export async function POST(request) {
 
     const [registrationResult] = await connection.execute(
       `INSERT INTO delegate_registrations
-        (pass_name, price_per_delegate, quantity, total_amount, organisation, address, city, state, country, zipcode, gst_number, track_of_interest, terms_accepted)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        (pass_name, price_per_delegate, quantity, total_amount, organisation, address, city, state, country, zipcode, gst_number, track_of_interest, promo_code, discount_amount, terms_accepted)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
       [
-        passName,
-        pricePerDelegate,
+        passType.name,
+        passType.price,
         quantity,
         totalAmount,
         company.organisation,
@@ -74,6 +91,8 @@ export async function POST(request) {
         company.zipcode,
         company.gstNumber || null,
         company.trackOfInterest || null,
+        appliedPromoCode,
+        discountAmount,
       ]
     );
     const registrationId = registrationResult.insertId;
@@ -88,10 +107,10 @@ export async function POST(request) {
     }
 
     const order = await getRazorpay().orders.create({
-      amount: totalAmount * 100, // paise
+      amount: Math.max(totalAmount, 0) * 100, // paise
       currency: "INR",
       receipt: `delegate_reg_${registrationId}`,
-      notes: { registrationId: String(registrationId), passName },
+      notes: { registrationId: String(registrationId), passName: passType.name, promoCode: appliedPromoCode || "" },
     });
 
     await connection.execute(`UPDATE delegate_registrations SET razorpay_order_id = ? WHERE id = ?`, [order.id, registrationId]);

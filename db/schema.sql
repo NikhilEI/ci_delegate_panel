@@ -136,3 +136,31 @@ ALTER TABLE delegate_registrations
   ADD COLUMN IF NOT EXISTS payment_notes VARCHAR(500) NULL AFTER razorpay_signature,
   ADD COLUMN IF NOT EXISTS payment_updated_by INT UNSIGNED NULL AFTER payment_notes,
   ADD COLUMN IF NOT EXISTS payment_updated_at TIMESTAMP NULL AFTER payment_updated_by;
+
+-- ---------------------------------------------------------------------------
+-- Promo codes: admin-managed discounts applied at checkout on the delegate
+-- cart page. A code can apply to every pass type (pass_type_id = NULL) or be
+-- restricted to one. max_uses / valid_from / valid_until are all optional -
+-- NULL means "no limit" / "no expiry".
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS promo_codes (
+  id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  code            VARCHAR(30)   NOT NULL,
+  discount_type   ENUM('percent', 'fixed') NOT NULL,
+  discount_value  INT UNSIGNED  NOT NULL,
+  pass_type_id    INT UNSIGNED  NULL,
+  max_uses        INT UNSIGNED  NULL,
+  used_count      INT UNSIGNED  NOT NULL DEFAULT 0,
+  valid_from      DATE          NULL,
+  valid_until     DATE          NULL,
+  is_active       TINYINT(1)    NOT NULL DEFAULT 1,
+  created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  UNIQUE KEY uniq_promo_code (code),
+  CONSTRAINT fk_promo_pass_type FOREIGN KEY (pass_type_id) REFERENCES pass_types(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE delegate_registrations
+  ADD COLUMN IF NOT EXISTS promo_code VARCHAR(30) NULL AFTER track_of_interest,
+  ADD COLUMN IF NOT EXISTS discount_amount INT UNSIGNED NOT NULL DEFAULT 0 AFTER promo_code;

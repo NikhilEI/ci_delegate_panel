@@ -15,12 +15,15 @@ export default async function DelegateRegistrationDetailsPage({ searchParams }) 
   const qty = Math.max(1, Math.min(50, parseInt(params?.qty, 10) || 1));
   const price = parseInt(params?.price, 10) || 0;
   const passName = params?.passName || "Delegate Pass";
+  const slug = params?.slug || "";
+  const promoCode = params?.promoCode || "";
+  const discount = Math.max(0, parseInt(params?.discount, 10) || 0);
 
   return (
     <>
       <Header />
       <FeaturedExpos />
-      <DelegateRegistrationForm qty={qty} price={price} passName={passName} />
+      <DelegateRegistrationForm qty={qty} price={price} passName={passName} slug={slug} promoCode={promoCode} discount={discount} />
       <Footer />
     </>
   );

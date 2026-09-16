@@ -33,6 +33,7 @@ export default async function DelegatePassCartPage({ params }) {
       <Header />
       <FeaturedExpos />
       <DelegateCart
+        slug={passType.slug}
         modifierClass={passType.badgeClass}
         passName={passType.name}
         price={passType.price}

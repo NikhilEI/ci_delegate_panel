@@ -17,12 +17,59 @@ function formatCurrency(amount) {
   return "INR " + amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export default function DelegateCart({ modifierClass, passName, price, baseFeatures, moreFeatures, detailsHref }) {
+export default function DelegateCart({ slug, modifierClass, passName, price, baseFeatures, moreFeatures, detailsHref }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [expanded, setExpanded] = useState(false);
 
-  const total = price * quantity;
+  const [promoInput, setPromoInput] = useState("");
+  const [promo, setPromo] = useState(null); // { code, discountAmount, message }
+  const [promoError, setPromoError] = useState("");
+  const [applying, setApplying] = useState(false);
+
+  const subtotal = price * quantity;
+  const discountAmount = promo?.discountAmount || 0;
+  const total = Math.max(0, subtotal - discountAmount);
+
+  async function applyPromoCode() {
+    if (!promoInput.trim()) return;
+    setApplying(true);
+    setPromoError("");
+    try {
+      const response = await fetch("/api/promo-codes/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput.trim(), passSlug: slug, quantity }),
+      });
+      const data = await response.json();
+      if (!data.valid) {
+        setPromo(null);
+        setPromoError(data.message || "This promo code is not valid.");
+        return;
+      }
+      setPromo({ code: data.code, discountAmount: data.discountAmount, message: data.message });
+    } catch {
+      setPromoError("Could not validate promo code. Please try again.");
+    } finally {
+      setApplying(false);
+    }
+  }
+
+  function removePromoCode() {
+    setPromo(null);
+    setPromoInput("");
+    setPromoError("");
+  }
+
+  // Re-check the applied code whenever quantity changes, since the discount
+  // (especially a percentage one) depends on the subtotal.
+  function updateQuantity(next) {
+    setQuantity(next);
+    if (promo) {
+      setPromo(null);
+      setPromoError("Quantity changed - please re-apply your promo code.");
+    }
+  }
 
   function continueToRegistration() {
     try {
@@ -39,7 +86,12 @@ export default function DelegateCart({ modifierClass, passName, price, baseFeatu
       price: String(price),
       total: String(total),
       passName,
+      slug,
     });
+    if (promo) {
+      qs.set("promoCode", promo.code);
+      qs.set("discount", String(discountAmount));
+    }
 
     router.push(`${detailsHref}?${qs.toString()}`);
   }
@@ -96,7 +148,7 @@ export default function DelegateCart({ modifierClass, passName, price, baseFeatu
                           type="button"
                           className="qty-btn"
                           aria-label="Decrease quantity"
-                          onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                          onClick={() => updateQuantity(Math.max(1, quantity - 1))}
                         >
                           {" "}
                           &minus;{" "}
@@ -104,7 +156,7 @@ export default function DelegateCart({ modifierClass, passName, price, baseFeatu
 
                         <span className="qty-value">{quantity}</span>
 
-                        <button type="button" className="qty-btn" aria-label="Increase quantity" onClick={() => setQuantity((value) => value + 1)}>
+                        <button type="button" className="qty-btn" aria-label="Increase quantity" onClick={() => updateQuantity(quantity + 1)}>
                           {" "}
                           +{" "}
                         </button>
@@ -127,8 +179,48 @@ export default function DelegateCart({ modifierClass, passName, price, baseFeatu
                     </span>
                   </div>
 
-                  <div className="delegate-ticket-item-price">{formatCurrency(total)}</div>
+                  <div className="delegate-ticket-item-price">{formatCurrency(subtotal)}</div>
                 </div>
+
+                <div style={{ margin: "16px 0" }}>
+                  {!promo ? (
+                    <div className="d-flex" style={{ gap: 8 }}>
+                      <input
+                        type="text"
+                        placeholder="Promo code"
+                        value={promoInput}
+                        onChange={(event) => setPromoInput(event.target.value.toUpperCase())}
+                        className="form-control"
+                        style={{ textTransform: "uppercase" }}
+                        onKeyDown={(event) => event.key === "Enter" && applyPromoCode()}
+                      />
+                      <button type="button" className="delegate-pass-cta-button" style={{ width: "auto", padding: "0 20px", margin: 0 }} onClick={applyPromoCode} disabled={applying}>
+                        {applying ? "..." : "Apply"}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="d-flex justify-content-between align-items-center" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "10px 14px" }}>
+                      <span style={{ color: "#166534", fontSize: 14 }}>
+                        <strong>{promo.code}</strong> applied - {promo.message}
+                      </span>
+                      <a href="#" onClick={(event) => { event.preventDefault(); removePromoCode(); }} style={{ fontSize: 13, color: "#166534", textDecoration: "underline" }}>
+                        Remove
+                      </a>
+                    </div>
+                  )}
+                  {promoError && <div style={{ color: "#b3261e", fontSize: 13, marginTop: 6 }}>{promoError}</div>}
+                </div>
+
+                {promo && (
+                  <div className="delegate-ticket-item-row">
+                    <div className="delegate-ticket-item-details">
+                      <span className="delegate-ticket-item-name">Discount</span>
+                    </div>
+                    <div className="delegate-ticket-item-price" style={{ color: "#166534" }}>
+                      -{formatCurrency(discountAmount)}
+                    </div>
+                  </div>
+                )}
 
                 <hr className="delegate-ticket-dashed-divider" />
 

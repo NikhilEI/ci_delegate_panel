@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed-pass-types": "node --env-file=.env.local scripts/seed-pass-types.mjs",
+    "db:seed-sample-data": "node --env-file=.env.local scripts/seed-sample-data.mjs",
+    "db:clear-sample-data": "node --env-file=.env.local scripts/clear-sample-data.mjs",
     "admin:create": "node --env-file=.env.local scripts/create-admin.mjs"
   },
   "dependencies": {

@@ -55,3 +55,64 @@
   box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
   border: 1px solid #eceef1;
 }
+
+/* The navbar's user-menu dropdown is positioned by us (see AdminNavbar.js),
+   not by Bootstrap/Popper JS - the vendor CSS's .dropdown-menu-end rule only
+   applies when Bootstrap's JS has added a [data-bs-popper] attribute, which
+   we don't do, so it falls back to a broken offset without this override. */
+.dropdown-user {
+  position: relative;
+}
+.dropdown-user .dropdown-menu {
+  position: absolute !important;
+  inset: auto !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  left: auto !important;
+  margin: 0 !important;
+  min-width: 220px;
+  max-width: calc(100vw - 32px);
+}
+
+/* Collapse-to-icon-rail sidebar. The vendor CSS's own width/padding rules
+   for this are only defined for the non-fixed menu layout
+   (":not(.layout-menu-fixed)") - since we use the fixed layout (sidebar
+   stays put while the page scrolls), we set the matching width/padding for
+   the fixed+collapsed combination ourselves. The text/icon hiding itself
+   still comes from the vendor's .menu-collapsed rules (applied via the
+   "menu-collapsed" class on the <aside> in AdminSidebar.js). */
+@media (min-width: 1200px) {
+  .layout-menu-fixed.layout-menu-collapsed .layout-menu {
+    width: 5.25rem;
+    transition: width 0.3s;
+  }
+  .layout-menu-fixed.layout-menu-collapsed .layout-page {
+    padding-left: 5.25rem;
+    transition: padding-left 0.3s;
+  }
+  .layout-menu-fixed .layout-page {
+    transition: padding-left 0.3s;
+  }
+
+  /* The vendor's own text-hiding rules are gated with ":not(:hover)" (a
+     hover-to-peek interaction that expects the width to expand on hover
+     too, which we don't do) - restating them without that gate keeps the
+     rail's labels reliably hidden instead of overflowing on mouseover. */
+  .layout-menu-fixed.layout-menu-collapsed .layout-menu .menu-inner > .menu-item {
+    width: 5.25rem;
+  }
+  .layout-menu-fixed.layout-menu-collapsed .layout-menu .menu-inner > .menu-item > .menu-link {
+    padding-left: 1rem;
+  }
+  .layout-menu-fixed.layout-menu-collapsed .layout-menu .menu-inner > .menu-item > .menu-link div {
+    overflow: hidden;
+    opacity: 0;
+    width: 0;
+  }
+  .layout-menu-fixed.layout-menu-collapsed .layout-menu .menu-inner > .menu-item > .menu-link .menu-icon {
+    margin-left: -2rem;
+    width: 5.25rem;
+    text-align: center;
+    margin-right: 0;
+  }
+}
