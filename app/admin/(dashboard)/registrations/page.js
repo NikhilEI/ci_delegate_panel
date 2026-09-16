@@ -2,19 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import PageHeader from "@/components/admin/PageHeader";
+import StatusBadge from "@/components/admin/StatusBadge";
+import LoadingState from "@/components/admin/LoadingState";
+import EmptyState from "@/components/admin/EmptyState";
 
 function formatCurrency(amount) {
   return "₹" + Number(amount || 0).toLocaleString("en-IN");
 }
 
-const badgeClassByStatus = {
-  paid: "bg-label-success",
-  pending: "bg-label-warning",
-  failed: "bg-label-danger",
-};
-
 export default function AdminRegistrationsPage() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(null);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("");
@@ -41,30 +39,34 @@ export default function AdminRegistrationsPage() {
 
   return (
     <div>
-      <h4 className="fw-bold mb-4">Delegate Registrations</h4>
+      <PageHeader icon="bx-id-card" title="Delegate Registrations" subtitle={`${total} registration${total === 1 ? "" : "s"} on file`} />
 
       <div className="card">
-        <div className="card-header d-flex flex-wrap gap-3 align-items-center justify-content-between">
-          <div className="d-flex flex-wrap gap-2">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search name, email, mobile, organisation"
-              value={search}
-              onChange={(event) => {
-                setPage(1);
-                setSearch(event.target.value);
-              }}
-              style={{ minWidth: 280 }}
-            />
+        <div className="card-header">
+          <div className="admin-toolbar">
+            <div className="input-group" style={{ width: 300 }}>
+              <span className="input-group-text bg-transparent">
+                <i className="bx bx-search"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search name, email, mobile, organisation"
+                value={search}
+                onChange={(event) => {
+                  setPage(1);
+                  setSearch(event.target.value);
+                }}
+              />
+            </div>
             <select
               className="form-select"
+              style={{ maxWidth: 170 }}
               value={status}
               onChange={(event) => {
                 setPage(1);
                 setStatus(event.target.value);
               }}
-              style={{ maxWidth: 180 }}
             >
               <option value="">All statuses</option>
               <option value="pending">Pending</option>
@@ -80,59 +82,63 @@ export default function AdminRegistrationsPage() {
           </div>
         )}
 
-        <div className="table-responsive">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Pass</th>
-                <th>Organisation</th>
-                <th>Qty</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id}>
-                  <td>#{row.id}</td>
-                  <td>
-                    <Link href={`/admin/registrations/${row.id}`}>{row.passName}</Link>
-                  </td>
-                  <td>{row.organisation}</td>
-                  <td>{row.quantity}</td>
-                  <td>{formatCurrency(row.totalAmount)}</td>
-                  <td>
-                    <span className={`badge ${badgeClassByStatus[row.paymentStatus] || "bg-label-secondary"}`}>{row.paymentStatus}</span>
-                  </td>
-                  <td>{new Date(row.createdAt).toLocaleString("en-IN")}</td>
-                </tr>
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="text-muted text-center py-4">
-                    No registrations found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        {rows === null ? (
+          <LoadingState label="Loading registrations..." />
+        ) : (
+          <>
+            <div className="table-responsive">
+              <table className="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Pass</th>
+                    <th>Organisation</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.id}>
+                      <td className="text-muted">#{row.id}</td>
+                      <td>
+                        <Link href={`/admin/registrations/${row.id}`} className="fw-semibold">
+                          {row.passName}
+                        </Link>
+                      </td>
+                      <td>{row.organisation}</td>
+                      <td>{row.quantity}</td>
+                      <td className="fw-semibold">{formatCurrency(row.totalAmount)}</td>
+                      <td>
+                        <StatusBadge status={row.paymentStatus} />
+                      </td>
+                      <td className="text-muted">{new Date(row.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {rows.length === 0 && <EmptyState icon="bx-id-card" title="No registrations found" subtitle="Try a different search or filter." />}
 
-        <div className="card-footer d-flex justify-content-between align-items-center">
-          <span className="text-muted">
-            Page {page} of {totalPages} ({total} total)
-          </span>
-          <div className="btn-group">
-            <button className="btn btn-outline-secondary btn-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-              Previous
-            </button>
-            <button className="btn btn-outline-secondary btn-sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-              Next
-            </button>
-          </div>
-        </div>
+            {rows.length > 0 && (
+              <div className="card-footer d-flex justify-content-between align-items-center">
+                <span className="text-muted" style={{ fontSize: 13 }}>
+                  Page {page} of {totalPages} · {total} total
+                </span>
+                <div className="btn-group">
+                  <button className="btn btn-outline-secondary btn-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                    <i className="bx bx-chevron-left"></i> Previous
+                  </button>
+                  <button className="btn btn-outline-secondary btn-sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+                    Next <i className="bx bx-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import PageHeader from "@/components/admin/PageHeader";
+import LoadingState from "@/components/admin/LoadingState";
+import EmptyState from "@/components/admin/EmptyState";
 
 const codePattern = /^[A-Z0-9_-]{3,30}$/;
 
@@ -59,7 +62,7 @@ function statusLabel(row) {
 }
 
 export default function AdminPromoCodesPage() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(null);
   const [passTypes, setPassTypes] = useState([]);
   const [loadError, setLoadError] = useState("");
   const [form, setForm] = useState(emptyForm());
@@ -142,7 +145,7 @@ export default function AdminPromoCodesPage() {
 
   return (
     <div>
-      <h4 className="fw-bold mb-4">Promo Codes</h4>
+      <PageHeader icon="bx-gift" title="Promo Codes" subtitle="Create and manage discount codes for the delegate checkout." />
 
       {loadError && (
         <div className="alert alert-danger" role="alert">
@@ -151,64 +154,71 @@ export default function AdminPromoCodesPage() {
       )}
 
       <div className="row">
-        <div className="col-12 col-lg-7 mb-4">
-          <div className="card">
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Code</th>
-                    <th>Discount</th>
-                    <th>Pass</th>
-                    <th>Used</th>
-                    <th>Status</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => {
-                    const status = statusLabel(row);
-                    return (
-                      <tr key={row.id}>
-                        <td className="text-nowrap fw-semibold">{row.code}</td>
-                        <td className="text-nowrap">{row.discountType === "percent" ? `${row.discountValue}%` : `₹${row.discountValue.toLocaleString("en-IN")}`}</td>
-                        <td>{row.passTypeName || "All passes"}</td>
-                        <td>
-                          {row.usedCount}
-                          {row.maxUses ? ` / ${row.maxUses}` : ""}
-                        </td>
-                        <td>
-                          <span className={`badge ${status.cls}`}>{status.text}</span>
-                        </td>
-                        <td className="text-end">
-                          <div className="btn-group btn-group-sm">
-                            <button className="btn btn-outline-primary" onClick={() => setForm(toFormState(row))}>
-                              Edit
-                            </button>
-                            <button className="btn btn-outline-danger" onClick={() => handleDelete(row)}>
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {rows.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="text-muted text-center py-4">
-                        No promo codes yet - add one on the right.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+        <div className="col-12 col-lg-8 mb-4">
+          <div className="card admin-sticky-panel">
+            <div className="card-header">
+              <h5 className="card-header-title">
+                <i className="bx bx-list-ul"></i> All Promo Codes
+              </h5>
             </div>
+            {rows === null ? (
+              <LoadingState label="Loading promo codes..." />
+            ) : (
+              <div className="table-responsive admin-scroll-table">
+                <table className="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Code</th>
+                      <th>Discount</th>
+                      <th>Pass</th>
+                      <th>Used</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row) => {
+                      const status = statusLabel(row);
+                      return (
+                        <tr key={row.id}>
+                          <td className="text-nowrap fw-semibold">{row.code}</td>
+                          <td className="text-nowrap">{row.discountType === "percent" ? `${row.discountValue}%` : `₹${row.discountValue.toLocaleString("en-IN")}`}</td>
+                          <td>{row.passTypeName || "All passes"}</td>
+                          <td>
+                            {row.usedCount}
+                            {row.maxUses ? ` / ${row.maxUses}` : ""}
+                          </td>
+                          <td>
+                            <span className={`badge ${status.cls}`}>{status.text}</span>
+                          </td>
+                          <td className="text-end">
+                            <div className="btn-group btn-group-sm">
+                              <button className="btn btn-outline-primary" onClick={() => setForm(toFormState(row))}>
+                                <i className="bx bx-edit-alt"></i>
+                              </button>
+                              <button className="btn btn-outline-danger" onClick={() => handleDelete(row)}>
+                                <i className="bx bx-trash"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {rows?.length === 0 && <EmptyState icon="bx-gift" title="No promo codes yet" subtitle="Add one on the right." />}
           </div>
         </div>
 
-        <div className="col-12 col-lg-5 mb-4">
+        <div className="col-12 col-lg-4 mb-4">
           <div className="card">
-            <h5 className="card-header">{form.id ? `Edit: ${form.code}` : "Add a new promo code"}</h5>
+            <div className="card-header">
+              <h5 className="card-header-title">
+                <i className={`bx ${form.id ? "bx-edit-alt" : "bx-plus-circle"}`}></i> {form.id ? `Edit: ${form.code}` : "Add a New Promo Code"}
+              </h5>
+            </div>
             <div className="card-body">
               <form onSubmit={handleSubmit} noValidate>
                 <div className="mb-3">

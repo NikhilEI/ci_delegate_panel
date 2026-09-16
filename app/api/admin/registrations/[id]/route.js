@@ -10,6 +10,7 @@ export async function GET(request, { params }) {
     const registrations = await query(
       `SELECT id, pass_name AS passName, price_per_delegate AS pricePerDelegate, quantity, total_amount AS totalAmount,
               organisation, address, city, state, country, zipcode, gst_number AS gstNumber, track_of_interest AS trackOfInterest,
+              promo_code AS promoCode, discount_amount AS discountAmount,
               payment_status AS paymentStatus, razorpay_order_id AS razorpayOrderId, razorpay_payment_id AS razorpayPaymentId,
               payment_notes AS paymentNotes, payment_updated_at AS paymentUpdatedAt, created_at AS createdAt
          FROM delegate_registrations WHERE id = ? LIMIT 1`,

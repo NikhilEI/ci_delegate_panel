@@ -69,9 +69,7 @@ export default function AdminNavbar({ adminName, adminEmail, onToggleMenu, onTog
               }}
             >
               <div className="avatar avatar-online">
-                <span className="rounded-circle d-flex align-items-center justify-content-center bg-label-primary fw-bold" style={{ width: 34, height: 34 }}>
-                  {initial}
-                </span>
+                <span className="avatar-initial rounded-circle bg-label-primary fw-bold">{initial}</span>
               </div>
             </a>
             <ul className={`dropdown-menu dropdown-menu-end${menuOpen ? " show" : ""}`}>

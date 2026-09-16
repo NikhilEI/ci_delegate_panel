@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import PageHeader from "@/components/admin/PageHeader";
+import LoadingState from "@/components/admin/LoadingState";
+import EmptyState from "@/components/admin/EmptyState";
 
 export default function AdminVisitorsPage() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(null);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -28,21 +31,27 @@ export default function AdminVisitorsPage() {
 
   return (
     <div>
-      <h4 className="fw-bold mb-4">Visitor Registrations</h4>
+      <PageHeader icon="bx-user-check" title="Visitor Registrations" subtitle={`${total} visitor${total === 1 ? "" : "s"} registered`} />
 
       <div className="card">
         <div className="card-header">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search name, email, mobile, organisation"
-            value={search}
-            onChange={(event) => {
-              setPage(1);
-              setSearch(event.target.value);
-            }}
-            style={{ maxWidth: 340 }}
-          />
+          <div className="admin-toolbar">
+            <div className="input-group" style={{ width: 300 }}>
+              <span className="input-group-text bg-transparent">
+                <i className="bx bx-search"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search name, email, mobile, organisation"
+                value={search}
+                onChange={(event) => {
+                  setPage(1);
+                  setSearch(event.target.value);
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         {error && (
@@ -51,61 +60,65 @@ export default function AdminVisitorsPage() {
           </div>
         )}
 
-        <div className="table-responsive">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Organisation</th>
-                <th>Designation</th>
-                <th>Email</th>
-                <th>Mobile</th>
-                <th>City</th>
-                <th>Objective</th>
-                <th>Registered</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id}>
-                  <td>#{row.id}</td>
-                  <td>
-                    {row.title} {row.firstName} {row.lastName}
-                  </td>
-                  <td>{row.organisation}</td>
-                  <td>{row.designation}</td>
-                  <td>{row.email}</td>
-                  <td>{row.mobile}</td>
-                  <td>{row.city}</td>
-                  <td>{row.objectiveOfVisit}</td>
-                  <td>{new Date(row.createdAt).toLocaleString("en-IN")}</td>
-                </tr>
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="text-muted text-center py-4">
-                    No visitor registrations found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        {rows === null ? (
+          <LoadingState label="Loading visitors..." />
+        ) : (
+          <>
+            <div className="table-responsive">
+              <table className="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Organisation</th>
+                    <th>Designation</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>City</th>
+                    <th>Objective</th>
+                    <th>Registered</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.id}>
+                      <td className="text-muted">#{row.id}</td>
+                      <td className="fw-semibold text-nowrap">
+                        {row.title} {row.firstName} {row.lastName}
+                      </td>
+                      <td>{row.organisation}</td>
+                      <td>{row.designation}</td>
+                      <td>{row.email}</td>
+                      <td>{row.mobile}</td>
+                      <td>{row.city}</td>
+                      <td className="text-truncate" style={{ maxWidth: 160 }} title={row.objectiveOfVisit}>
+                        {row.objectiveOfVisit}
+                      </td>
+                      <td className="text-muted">{new Date(row.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {rows.length === 0 && <EmptyState icon="bx-user-check" title="No visitor registrations found" subtitle="Try a different search." />}
 
-        <div className="card-footer d-flex justify-content-between align-items-center">
-          <span className="text-muted">
-            Page {page} of {totalPages} ({total} total)
-          </span>
-          <div className="btn-group">
-            <button className="btn btn-outline-secondary btn-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-              Previous
-            </button>
-            <button className="btn btn-outline-secondary btn-sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-              Next
-            </button>
-          </div>
-        </div>
+            {rows.length > 0 && (
+              <div className="card-footer d-flex justify-content-between align-items-center">
+                <span className="text-muted" style={{ fontSize: 13 }}>
+                  Page {page} of {totalPages} · {total} total
+                </span>
+                <div className="btn-group">
+                  <button className="btn btn-outline-secondary btn-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                    <i className="bx bx-chevron-left"></i> Previous
+                  </button>
+                  <button className="btn btn-outline-secondary btn-sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+                    Next <i className="bx bx-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

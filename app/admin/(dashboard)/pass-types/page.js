@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import PageHeader from "@/components/admin/PageHeader";
+import LoadingState from "@/components/admin/LoadingState";
+import EmptyState from "@/components/admin/EmptyState";
 
 const badgeOptions = [
   { value: "delegate-pass-platinum", label: "Platinum (purple)" },
@@ -52,7 +55,7 @@ function validate(form) {
 }
 
 export default function AdminPassTypesPage() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [form, setForm] = useState(emptyForm());
   const [fieldErrors, setFieldErrors] = useState({});
@@ -127,7 +130,7 @@ export default function AdminPassTypesPage() {
 
   return (
     <div>
-      <h4 className="fw-bold mb-4">Pass Types</h4>
+      <PageHeader icon="bx-purchase-tag-alt" title="Pass Types" subtitle="Drives the pricing cards on the public homepage - edits here go live immediately." />
 
       {loadError && (
         <div className="alert alert-danger" role="alert">
@@ -136,56 +139,65 @@ export default function AdminPassTypesPage() {
       )}
 
       <div className="row">
-        <div className="col-12 col-lg-7 mb-4">
-          <div className="card">
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Order</th>
-                    <th>Name</th>
-                    <th>Slug</th>
-                    <th>Price</th>
-                    <th>Active</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.id}>
-                      <td>{row.sortOrder}</td>
-                      <td className="text-nowrap">{row.name}</td>
-                      <td className="text-muted text-nowrap">{row.slug}</td>
-                      <td>₹{row.price.toLocaleString("en-IN")}</td>
-                      <td>{row.isActive ? <span className="badge bg-label-success">Yes</span> : <span className="badge bg-label-secondary">No</span>}</td>
-                      <td className="text-end">
-                        <div className="btn-group btn-group-sm">
-                          <button className="btn btn-outline-primary" onClick={() => setForm(toFormState(row))}>
-                            Edit
-                          </button>
-                          <button className="btn btn-outline-danger" onClick={() => handleDelete(row)}>
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {rows.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="text-muted text-center py-4">
-                        No pass types yet - add one on the right.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+        <div className="col-12 col-lg-8 mb-4">
+          <div className="card admin-sticky-panel">
+            <div className="card-header">
+              <h5 className="card-header-title">
+                <i className="bx bx-list-ul"></i> All Pass Types
+              </h5>
             </div>
+            {rows === null ? (
+              <LoadingState label="Loading pass types..." />
+            ) : (
+              <div className="table-responsive admin-scroll-table">
+                <table className="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Order</th>
+                      <th>Name</th>
+                      <th>Slug</th>
+                      <th>Price</th>
+                      <th>Active</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row) => (
+                      <tr key={row.id}>
+                        <td className="text-muted">{row.sortOrder}</td>
+                        <td className="text-nowrap fw-semibold">{row.name}</td>
+                        <td className="text-muted text-truncate" style={{ maxWidth: 160, fontSize: 12.5 }} title={row.slug}>
+                          {row.slug}
+                        </td>
+                        <td className="fw-semibold">₹{row.price.toLocaleString("en-IN")}</td>
+                        <td>{row.isActive ? <span className="badge bg-label-success">Yes</span> : <span className="badge bg-label-secondary">No</span>}</td>
+                        <td className="text-end">
+                          <div className="btn-group btn-group-sm">
+                            <button className="btn btn-outline-primary" onClick={() => setForm(toFormState(row))}>
+                              <i className="bx bx-edit-alt"></i>
+                            </button>
+                            <button className="btn btn-outline-danger" onClick={() => handleDelete(row)}>
+                              <i className="bx bx-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {rows?.length === 0 && <EmptyState icon="bx-purchase-tag-alt" title="No pass types yet" subtitle="Add one on the right." />}
           </div>
         </div>
 
-        <div className="col-12 col-lg-5 mb-4">
+        <div className="col-12 col-lg-4 mb-4">
           <div className="card">
-            <h5 className="card-header">{form.id ? `Edit: ${form.name}` : "Add a new pass type"}</h5>
+            <div className="card-header">
+              <h5 className="card-header-title">
+                <i className={`bx ${form.id ? "bx-edit-alt" : "bx-plus-circle"}`}></i> {form.id ? `Edit: ${form.name}` : "Add a New Pass Type"}
+              </h5>
+            </div>
             <div className="card-body">
               <form onSubmit={handleSubmit} noValidate>
                 <div className="mb-3">
