@@ -10,6 +10,19 @@ function emptyDelegate() {
   return { title: "", firstName: "", lastName: "", designation: "", designationOther: "", email: "", mobile: "" };
 }
 
+const GST_PATTERN = "^[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}[1-9A-Za-z]{1}Z[0-9A-Za-z]{1}$";
+const MOBILE_PATTERN = "^[6-9][0-9]{9}$";
+const PINCODE_PATTERN = "^[0-9]{4,10}$";
+const EMAIL_PATTERN = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$";
+
+function withCustomMessage(message) {
+  return (event) => event.target.setCustomValidity(message);
+}
+
+function clearCustomMessage(event) {
+  event.target.setCustomValidity("");
+}
+
 function DelegateBlock({ index, delegate, onChange }) {
   const label = index === 0 ? "Delegate 1" : `Delegate ${index + 1}`;
 
@@ -55,9 +68,15 @@ function DelegateBlock({ index, delegate, onChange }) {
             autoComplete="off"
             maxLength={30}
             minLength={2}
+            pattern="^[A-Za-z][A-Za-z .'-]{1,29}$"
+            title="At least 2 letters, no numbers or symbols"
             className="form-control"
             value={delegate.firstName}
-            onChange={(event) => set("firstName", event.target.value)}
+            onChange={(event) => {
+              clearCustomMessage(event);
+              set("firstName", event.target.value);
+            }}
+            onInvalid={withCustomMessage("Enter a valid first name (letters only, at least 2 characters).")}
           />
         </div>
         <div className="col-md-4 mb-4">
@@ -70,9 +89,15 @@ function DelegateBlock({ index, delegate, onChange }) {
             autoComplete="off"
             maxLength={30}
             minLength={2}
+            pattern="^[A-Za-z][A-Za-z .'-]{1,29}$"
+            title="At least 2 letters, no numbers or symbols"
             className="form-control"
             value={delegate.lastName}
-            onChange={(event) => set("lastName", event.target.value)}
+            onChange={(event) => {
+              clearCustomMessage(event);
+              set("lastName", event.target.value);
+            }}
+            onInvalid={withCustomMessage("Enter a valid last name (letters only, at least 2 characters).")}
           />
         </div>
       </div>
@@ -117,9 +142,15 @@ function DelegateBlock({ index, delegate, onChange }) {
             autoComplete="email"
             maxLength={50}
             minLength={2}
+            pattern={EMAIL_PATTERN}
+            title="Enter a valid email address"
             className="form-control"
             value={delegate.email}
-            onChange={(event) => set("email", event.target.value)}
+            onChange={(event) => {
+              clearCustomMessage(event);
+              set("email", event.target.value);
+            }}
+            onInvalid={withCustomMessage("Enter a valid email address, e.g. name@company.com.")}
           />
         </div>
         <div className="col-md-4 mb-4">
@@ -137,11 +168,19 @@ function DelegateBlock({ index, delegate, onChange }) {
                 type="text"
                 required
                 autoComplete="off"
-                maxLength={15}
+                maxLength={10}
+                minLength={10}
+                inputMode="numeric"
+                pattern={MOBILE_PATTERN}
+                title="10-digit Indian mobile number"
                 placeholder="Mobile Number"
                 className="form-control"
                 value={delegate.mobile}
-                onChange={(event) => set("mobile", event.target.value.replace(/[^0-9]/g, ""))}
+                onChange={(event) => {
+                  clearCustomMessage(event);
+                  set("mobile", event.target.value.replace(/[^0-9]/g, "").slice(0, 10));
+                }}
+                onInvalid={withCustomMessage("Enter a valid 10-digit mobile number starting with 6-9.")}
               />
             </div>
           </div>
@@ -376,7 +415,11 @@ export default function DelegateRegistrationForm({ qty, price, passName, slug, p
                         minLength={2}
                         className="form-control"
                         value={company.organisation}
-                        onChange={(event) => updateCompany("organisation", event.target.value)}
+                        onChange={(event) => {
+                          clearCustomMessage(event);
+                          updateCompany("organisation", event.target.value);
+                        }}
+                        onInvalid={withCustomMessage("Enter your company / organisation name (at least 2 characters).")}
                       />
                     </div>
                     <div className="col-md-4 mb-4">
@@ -391,7 +434,11 @@ export default function DelegateRegistrationForm({ qty, price, passName, slug, p
                         minLength={2}
                         className="form-control"
                         value={company.address}
-                        onChange={(event) => updateCompany("address", event.target.value)}
+                        onChange={(event) => {
+                          clearCustomMessage(event);
+                          updateCompany("address", event.target.value);
+                        }}
+                        onInvalid={withCustomMessage("Enter your address (at least 2 characters).")}
                       />
                     </div>
                     <div className="col-md-4 mb-4">
@@ -404,9 +451,14 @@ export default function DelegateRegistrationForm({ qty, price, passName, slug, p
                         autoComplete="off"
                         maxLength={50}
                         minLength={2}
+                        pattern="^[A-Za-z][A-Za-z .'-]*$"
                         className="form-control"
                         value={company.city}
-                        onChange={(event) => updateCompany("city", event.target.value)}
+                        onChange={(event) => {
+                          clearCustomMessage(event);
+                          updateCompany("city", event.target.value);
+                        }}
+                        onInvalid={withCustomMessage("Enter a valid city name (letters only).")}
                       />
                     </div>
                   </div>
@@ -422,9 +474,14 @@ export default function DelegateRegistrationForm({ qty, price, passName, slug, p
                         autoComplete="off"
                         maxLength={50}
                         minLength={2}
+                        pattern="^[A-Za-z][A-Za-z .'-]*$"
                         className="form-control"
                         value={company.state}
-                        onChange={(event) => updateCompany("state", event.target.value)}
+                        onChange={(event) => {
+                          clearCustomMessage(event);
+                          updateCompany("state", event.target.value);
+                        }}
+                        onInvalid={withCustomMessage("Enter a valid state name (letters only).")}
                       />
                     </div>
                     <div className="col-md-4 mb-4">
@@ -435,11 +492,18 @@ export default function DelegateRegistrationForm({ qty, price, passName, slug, p
                         type="text"
                         required
                         autoComplete="off"
-                        maxLength={50}
-                        minLength={2}
+                        maxLength={10}
+                        minLength={4}
+                        inputMode="numeric"
+                        pattern={PINCODE_PATTERN}
+                        title="4-10 digit postal / PIN code"
                         className="form-control"
                         value={company.zipcode}
-                        onChange={(event) => updateCompany("zipcode", event.target.value)}
+                        onChange={(event) => {
+                          clearCustomMessage(event);
+                          updateCompany("zipcode", event.target.value.replace(/[^0-9]/g, "").slice(0, 10));
+                        }}
+                        onInvalid={withCustomMessage("Enter a valid postal / PIN code (4-10 digits).")}
                       />
                     </div>
                     <div className="col-md-4 mb-4">
@@ -452,16 +516,21 @@ export default function DelegateRegistrationForm({ qty, price, passName, slug, p
 
                   <div className="row">
                     <div className="col-md-4 mb-4">
-                      <label className="col-form-label">
-                        GST Number <span className="star-mark">*</span>
-                      </label>
+                      <label className="col-form-label">GST Number</label>
                       <input
                         type="text"
-                        required
                         placeholder="Your GST Number (Optional)"
+                        maxLength={15}
+                        pattern={GST_PATTERN}
+                        title="15-character GSTIN, e.g. 27ABCDE1234F1Z5"
                         className="form-control"
+                        style={{ textTransform: "uppercase" }}
                         value={company.gstNumber}
-                        onChange={(event) => updateCompany("gstNumber", event.target.value)}
+                        onChange={(event) => {
+                          clearCustomMessage(event);
+                          updateCompany("gstNumber", event.target.value.toUpperCase());
+                        }}
+                        onInvalid={withCustomMessage("Enter a valid 15-character GSTIN (e.g. 27ABCDE1234F1Z5) or leave this blank.")}
                       />
                     </div>
                     <div className="col-md-4 mb-4">

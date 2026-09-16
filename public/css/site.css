@@ -722,8 +722,10 @@ label.error, .exhibitor-profile-form-main label.error{display: none; color: #f00
 .delegate-form-main-outer{width: 100%; height: auto; /*float:left;*/ font-size:15px; color:#000; background: #fff; border: 1px solid var(--border); border-radius: 30px; /*box-shadow: 0 0px 10px rgba(26,20,100,0.7);*/ overflow: hidden; padding-bottom: 20px;}
 
 .delegate-form-main-outer .form-control::placeholder{font-size: 15px; color: #a8a7a7;}
-.delegate-form-main-outer .form-control{font-size: 15px; color: #b6b6b6;}
-.delegate-form-main-outer .form-control.form-select{font-size: 15px; color: #b6b6b6;}
+.delegate-form-main-outer .form-control{font-size: 15px; color: #000;}
+.delegate-form-main-outer .form-control.form-select{font-size: 15px; color: #000;}
+.delegate-form-main-outer .form-control.is-invalid{border-color: #dc3545; box-shadow: 0 0 0 0.15rem rgba(220,53,69,.15);}
+.delegate-form-main-outer .field-error{display: block; color: #dc3545; font-size: 12.5px; margin-top: 4px;}
 
 .delegate-pass-container {display: flex; align-items: center; justify-content: space-between; width: 100%; margin: 0 auto; padding: 24px 28px; background: linear-gradient(180deg, #eae8f7 0%, #f4f3f9 100%); border-radius: 30px 30px 0 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);}
 
