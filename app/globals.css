@@ -1,0 +1,29 @@
+/* Page styling is provided by the self-hosted stylesheets loaded in
+   app/layout.js (bootstrap.min.css, fontawesome.css, bootstrap-icons.min.css,
+   site.css). Only the page-specific overrides from the source page's inline
+   <style> blocks live here. */
+
+@media (min-width: 992px) {
+  .header-scroll .logo-box-ci {
+    width: 430px;
+  }
+  .header-scroll .logo-box-sci {
+    width: 143px;
+  }
+}
+
+@media (min-width: 768px) {
+  .header-scroll .logo-box-ci {
+    width: 430px;
+  }
+  .header-scroll .logo-box-sci {
+    width: 143px;
+  }
+  .logo-box-ci {
+    width: 430px;
+  }
+  .logo-box-sci {
+    width: 143px;
+  }
+}
+

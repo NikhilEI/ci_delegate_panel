@@ -1,0 +1,159 @@
+/* Styling for the visitor registration widget, adapted from the source
+   registration/forms/visitor-registration-otp-form-ab1.aspx fragment. */
+
+:root {
+  --navy: #1a1464;
+  --magenta: #ec008c;
+  --mag-hov: #c9007a;
+  --light-bg: #f5f5fd;
+  --border: #dde2ef;
+  --text: #222;
+  --muted: #666;
+  --radius: 6px;
+}
+
+.exhibitor-profile-form-main {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 28px 20px;
+  box-shadow: 0 2px 12px rgba(26, 20, 100, 0.07);
+}
+
+.exhibitor-profile-form-main .star-mark {
+  color: var(--magenta);
+}
+.exhibitor-profile-form-main .form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 5px;
+  display: block;
+}
+
+.exhibitor-profile-form-main .form-control,
+.exhibitor-profile-form-main .form-select {
+  height: 42px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--text);
+  background-color: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  padding: 0 12px;
+}
+.exhibitor-profile-form-main .form-control:focus,
+.exhibitor-profile-form-main .form-select:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(26, 20, 100, 0.1);
+  outline: none;
+}
+.exhibitor-profile-form-main select.form-control,
+.exhibitor-profile-form-main select.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231a1464' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+}
+.exhibitor-profile-form-main input[disabled] {
+  background: var(--light-bg);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.exhibitor-profile-form-main > form > .row {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.exhibitor-profile-form-main > form > .row + .row {
+  border-top: 1px solid #f0f0f8;
+  margin-top: 4px;
+}
+
+.verify-white-bg {
+  background: var(--light-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  gap: 8px;
+}
+.verify-white-bg .btn-secondary {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0 16px;
+  height: 42px;
+  white-space: nowrap;
+}
+.exhibitor-profile-form-main .btn-secondary {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0 16px;
+  height: 42px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.exhibitor-profile-form-main .btn-secondary:hover {
+  background: #0f0c3e;
+}
+.exhibitor-profile-form-main .btn-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.exhibitor-profile-form-main .btn-dark {
+  background: var(--magenta);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0 14px;
+  height: 38px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.exhibitor-profile-form-main .btn-dark:hover {
+  background: var(--mag-hov);
+}
+
+.exhibitor-profile-form-main .form-check-input {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: var(--navy);
+}
+.exhibitor-profile-form-main .form-check-label {
+  font-size: 13.5px;
+  color: var(--text);
+  cursor: pointer;
+  padding-left: 4px;
+}
+.exhibitor-profile-form-main .form-check-label a {
+  color: var(--navy);
+  text-decoration: underline;
+}
+.exhibitor-profile-form-main .form-check-label a:hover {
+  color: var(--magenta);
+}
+
+.disclaimer-col-txt {
+  background: #eef3ff;
+  border-left: 4px solid var(--navy);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #444;
+  line-height: 1.65;
+}
