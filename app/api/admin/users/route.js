@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
-import { query } from "@/lib/db";
+import { query, parseJsonColumn } from "@/lib/db";
 import { ALL_MODULE_KEYS } from "@/lib/permissions";
 
 const emailPattern = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
 
 function parsePermissions(row) {
-  return { ...row, permissions: typeof row.permissions === "string" ? JSON.parse(row.permissions) : row.permissions || [] };
+  return { ...row, permissions: parseJsonColumn(row.permissions, []) };
 }
 
 export async function GET() {

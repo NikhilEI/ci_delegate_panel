@@ -1,0 +1,20 @@
+-- Seeds the 4 homepage pass cards (Platinum/Gold/Silver/Visitor) directly via
+-- SQL, as an alternative to `node --env-file=.env.production scripts/seed-pass-types.mjs`.
+-- Safe to re-run (upserts by slug).
+-- Run with:
+--   mysql -u <user> -p <database_name> < db/seed-pass-types.sql
+
+INSERT INTO pass_types (slug, name, price, badge_class, base_features, more_features, sort_order, is_active)
+VALUES
+('platinum-delegate-passes', 'Platinum Delegate Pass', 20000, 'delegate-pass-platinum', '["Access to the exhibition area","Fast-track registration","Delegate kit","Access to all conference tracks & stages","Lunch in the dining area","Access to the evening awards ceremony","Pre-event matchmaking via Expo mobile app","Post-event access to on-demand session recordings"]', '["Priority seating at conference sessions","Access to the networking night","Access to the business networking lounge","Certificate of attendance","Exclusive access to the VIP lounge","Exclusive car parking pass","Access to plenary sessions","Invitation to the inauguration ceremony","Dedicated concierge support/ Guided tour of the venue","Exclusive video feature on expo social media channels (subject to availability)"]', 1, 1),
+('gold-delegate-passes', 'Gold Delegate Pass', 15000, 'delegate-pass-gold', '["Access to the exhibition area","Fast-track registration","Delegate kit","Access to all conference tracks & stages","Lunch in the dining area","Access to the evening awards ceremony","Pre-event matchmaking via Expo mobile app","Post-event access to on-demand session recordings"]', '["Priority seating at conference sessions","Access to the networking night","Access to the business networking lounge","Certificate of attendance","~~Exclusive access to the VIP lounge~~","~~Exclusive car parking pass~~","~~Access to plenary sessions~~","~~Invitation to the inauguration ceremony~~","~~Dedicated concierge support/ Guided tour of the venue~~","~~Exclusive video feature on expo social media channels (subject to availability)~~"]', 2, 1),
+('silver-delegate-passes', 'Silver Delegate Pass', 10000, 'delegate-pass-silver', '["Access to the exhibition area","Fast-track registration","Delegate kit","Access to all conference tracks & stages","Lunch in the dining area","Access to the evening awards ceremony","Pre-event matchmaking via Expo mobile app","Post-event access to on-demand session recordings"]', '["~~Priority seating at conference sessions~~","~~Access to the networking night~~","~~Access to the business networking lounge~~","~~Certificate of attendance~~","~~Exclusive access to the VIP lounge~~","~~Exclusive car parking pass~~","~~Access to plenary sessions~~","~~Invitation to the inauguration ceremony~~","~~Dedicated concierge support/ Guided tour of the venue~~","~~Exclusive video feature on expo social media channels (subject to availability)~~"]', 3, 1),
+('visitor-pass', 'Visitor Pass', 0, 'delegate-pass-visitor', '["Entry to exhibition area","Access to leading technology brands","Networking opportunities with industry professionals","Pre-event matchmaking via Expo mobile app","~~Delegate kit~~","~~Access to all conference tracks & stages~~","~~Lunch in the dining area~~","~~Access to the evening awards ceremony~~"]', '["~~Pre-event matchmaking via Expo mobile app~~","~~Post-event access to on-demand session recordings~~","~~Priority seating at conference sessions~~","~~Access to the networking night~~","~~Access to the business networking lounge~~","~~Certificate of attendance~~","~~Exclusive access to the VIP lounge~~","~~Exclusive car parking pass~~","~~Access to plenary sessions~~","~~Invitation to the inauguration ceremony~~","~~Dedicated concierge support/ Guided tour of the venue~~","~~Exclusive video feature on expo social media channels (subject to availability)~~"]', 4, 1)
+ON DUPLICATE KEY UPDATE
+  name = VALUES(name),
+  price = VALUES(price),
+  badge_class = VALUES(badge_class),
+  base_features = VALUES(base_features),
+  more_features = VALUES(more_features),
+  sort_order = VALUES(sort_order),
+  is_active = VALUES(is_active);

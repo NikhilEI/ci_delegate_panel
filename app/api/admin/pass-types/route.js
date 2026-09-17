@@ -1,4 +1,4 @@
-import { query } from "@/lib/db";
+import { query, parseJsonColumn } from "@/lib/db";
 
 const slugPattern = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
@@ -20,12 +20,13 @@ export async function GET() {
          FROM pass_types
         ORDER BY sort_order, id`
     );
-    // MariaDB stores JSON as LONGTEXT under the hood, so mysql2 hands these
-    // back as raw strings rather than auto-parsing them.
+    // MariaDB stores JSON as LONGTEXT and hands it back as a raw string;
+    // real MySQL has a native JSON type and mysql2 auto-parses it already -
+    // parseJsonColumn handles either.
     const parsedRows = rows.map((row) => ({
       ...row,
-      baseFeatures: JSON.parse(row.baseFeatures),
-      moreFeatures: JSON.parse(row.moreFeatures),
+      baseFeatures: parseJsonColumn(row.baseFeatures, []),
+      moreFeatures: parseJsonColumn(row.moreFeatures, []),
     }));
     return Response.json({ success: true, rows: parsedRows });
   } catch (error) {

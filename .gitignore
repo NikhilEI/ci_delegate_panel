@@ -35,6 +35,7 @@ yarn-error.log*
 
 # local-only credential docs
 /docs/ADMIN_CREDENTIALS.md
+/db/create-admin.sql
 
 # generated badge images (regenerable from the DB, not source)
 /public/badges/

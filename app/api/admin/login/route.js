@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { query } from "@/lib/db";
+import { query, parseJsonColumn } from "@/lib/db";
 import { signAdminSession, ADMIN_COOKIE_NAME } from "@/lib/auth";
 
 const emailPattern = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
@@ -25,7 +25,7 @@ export async function POST(request) {
   try {
     const rows = await query(`SELECT id, name, email, password_hash, role, permissions FROM admins WHERE email = ? LIMIT 1`, [email]);
     const admin = rows[0];
-    if (admin) admin.permissions = typeof admin.permissions === "string" ? JSON.parse(admin.permissions) : admin.permissions || [];
+    if (admin) admin.permissions = parseJsonColumn(admin.permissions, []);
 
     // Always run bcrypt.compare (even against a dummy hash) so a missing
     // account doesn't respond measurably faster than a wrong password.
