@@ -151,7 +151,7 @@ export default function VisitorRegistrationForm() {
       const response = await fetch("/api/visitor-registrations/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: fields.email.trim(), mobile: fields.mobile.trim() }),
+        body: JSON.stringify({ email: fields.email.trim(), mobile: fields.mobile.trim(), countryCode: fields.countryCode }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) {
@@ -480,7 +480,7 @@ export default function VisitorRegistrationForm() {
                     <div className="row">
                       <div className="col-12">
                         <label className="form-label d-none d-md-block">
-                          Verify OTP on Mobile or Email id <span className="star-mark">*</span>
+                          Verify OTP on Mobile <span className="star-mark">*</span>
                         </label>
                       </div>
                       <div className="col-4">

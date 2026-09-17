@@ -64,13 +64,15 @@ CREATE TABLE IF NOT EXISTS visitor_otp_requests (
   id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   email        VARCHAR(100) NOT NULL,
   mobile       VARCHAR(20)  NOT NULL,
+  ip_address   VARCHAR(45)  NULL,
   otp_code     CHAR(6)      NOT NULL,
   expires_at   TIMESTAMP    NOT NULL,
   verified     TINYINT(1)   NOT NULL DEFAULT 0,
   attempts     INT UNSIGNED NOT NULL DEFAULT 0,
   created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  INDEX idx_email_mobile (email, mobile)
+  INDEX idx_email_mobile (email, mobile),
+  INDEX idx_ip_created (ip_address, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS visitor_registrations (
