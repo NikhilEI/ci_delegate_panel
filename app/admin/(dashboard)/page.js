@@ -217,8 +217,8 @@ export default function AdminDashboardPage() {
               <h5 className="card-header-title">
                 <i className="bx bx-user-check"></i> Recent Visitors
               </h5>
-              <Link href="/admin/companies" className="btn btn-sm btn-outline-secondary">
-                View companies
+              <Link href="/admin/visitors" className="btn btn-sm btn-outline-secondary">
+                View all
               </Link>
             </div>
             <div className="table-responsive">

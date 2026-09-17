@@ -1,5 +1,6 @@
 import { query } from "@/lib/db";
 import { resolveCompanyId } from "@/lib/companies";
+import { generateBadge } from "@/lib/badges";
 
 const emailPattern = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
 
@@ -70,7 +71,28 @@ export async function POST(request) {
       ]
     );
 
-    return Response.json({ success: true, id: result.insertId });
+    // The visitor pass is free and instant, so unlike delegate badges (which
+    // an admin generates deliberately, after payment), the visitor's badge
+    // is generated right away - they land on its public display page next.
+    // A failure here shouldn't fail the registration itself; the admin can
+    // still generate it manually from /admin/visitors if this errors.
+    let badgeId = null;
+    try {
+      const siteOrigin = new URL(request.url).origin;
+      const generated = await generateBadge({
+        tierKey: "visitor",
+        numericId: result.insertId,
+        name: `${body.title} ${body.firstName.trim()} ${body.lastName.trim()}`.trim(),
+        company: body.organisation.trim(),
+        siteOrigin,
+      });
+      badgeId = generated.badgeId;
+      await query(`UPDATE visitor_registrations SET badge_id = ?, badge_generated_at = NOW() WHERE id = ?`, [badgeId, result.insertId]);
+    } catch (badgeError) {
+      console.error("auto badge generation failed for visitor registration:", result.insertId, badgeError);
+    }
+
+    return Response.json({ success: true, id: result.insertId, badgeId });
   } catch (error) {
     if (error?.code === "ER_DUP_ENTRY") {
       return Response.json({ success: false, message: "This email or mobile number is already registered." }, { status: 409 });

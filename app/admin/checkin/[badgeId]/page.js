@@ -1,5 +1,5 @@
 import { query } from "@/lib/db";
-import { tierKeyFromBadgeId, BADGE_TIERS } from "@/lib/badges";
+import { tierKeyFromBadgeId, BADGE_THEME_COLOR } from "@/lib/badges";
 
 export const metadata = {
   title: "Badge Check-in - Convergence India",
@@ -55,7 +55,7 @@ async function lookupAndCheckIn(badgeId) {
 export default async function CheckinPage({ params }) {
   const { badgeId } = await params;
   const tierKey = tierKeyFromBadgeId(badgeId);
-  const tint = tierKey ? BADGE_TIERS[tierKey].color : "#8592a3";
+  const tint = tierKey ? BADGE_THEME_COLOR : "#8592a3";
 
   let attendee = null;
   let error = "";

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import CountrySelect from "./CountrySelect";
 import { titleOptions, designationOptions, objectiveOfVisitOptions, productInterestOptions } from "@/lib/registrationOptions";
 import { indiaStates, indiaStatesWithCities } from "@/lib/indiaStates";
@@ -62,6 +63,7 @@ function CityField({ state, city, onChange }) {
 }
 
 export default function VisitorRegistrationForm() {
+  const router = useRouter();
   const formRef = useRef(null);
 
   const [fields, setFields] = useState({
@@ -248,6 +250,12 @@ export default function VisitorRegistrationForm() {
       const data = await response.json();
       if (!response.ok || !data.success) {
         throw new Error(data.message || "Could not submit registration.");
+      }
+      if (data.badgeId) {
+        // The badge is generated instantly and only ever shown on its own
+        // page (not inline here) - send the visitor straight there.
+        router.push(`/visitor-registration/badge?id=${encodeURIComponent(data.badgeId)}`);
+        return;
       }
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });

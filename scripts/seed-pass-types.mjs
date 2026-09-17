@@ -46,6 +46,36 @@ const goldMoreFeatures = [
 
 const silverMoreFeatures = platinumMoreFeatures.map((feature) => `~~${feature}~~`);
 
+// The free Visitor Pass is part of the same editable catalog now (managed
+// from /admin/pass-types) - DelegatePasses.js special-cases badgeClass
+// "delegate-pass-visitor" to show "Free" / "Register Now" / link to
+// /visitor-registration instead of the paid checkout flow. Price/slug are
+// mostly bookkeeping since visitor-registrations doesn't consult this row.
+const visitorBaseFeatures = [
+  "Entry to exhibition area",
+  "Access to leading technology brands",
+  "Networking opportunities with industry professionals",
+  "Pre-event matchmaking via Expo mobile app",
+  "~~Delegate kit~~",
+  "~~Access to all conference tracks & stages~~",
+  "~~Lunch in the dining area~~",
+  "~~Access to the evening awards ceremony~~",
+];
+const visitorMoreFeatures = [
+  "~~Pre-event matchmaking via Expo mobile app~~",
+  "~~Post-event access to on-demand session recordings~~",
+  "~~Priority seating at conference sessions~~",
+  "~~Access to the networking night~~",
+  "~~Access to the business networking lounge~~",
+  "~~Certificate of attendance~~",
+  "~~Exclusive access to the VIP lounge~~",
+  "~~Exclusive car parking pass~~",
+  "~~Access to plenary sessions~~",
+  "~~Invitation to the inauguration ceremony~~",
+  "~~Dedicated concierge support/ Guided tour of the venue~~",
+  "~~Exclusive video feature on expo social media channels (subject to availability)~~",
+];
+
 const passTypes = [
   {
     slug: "platinum-delegate-passes",
@@ -73,6 +103,15 @@ const passTypes = [
     baseFeatures: sharedBaseFeatures,
     moreFeatures: silverMoreFeatures,
     sortOrder: 3,
+  },
+  {
+    slug: "visitor-pass",
+    name: "Visitor Pass",
+    price: 0,
+    badgeClass: "delegate-pass-visitor",
+    baseFeatures: visitorBaseFeatures,
+    moreFeatures: visitorMoreFeatures,
+    sortOrder: 4,
   },
 ];
 

@@ -8,6 +8,7 @@ import { hasModule } from "@/lib/permissions";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: "bx-pie-chart-alt-2", module: null },
   { href: "/admin/registrations", label: "Delegate Registrations", icon: "bx-id-card", module: "registrations" },
+  { href: "/admin/visitors", label: "Visitor Registrations", icon: "bx-user-check", module: "companies" },
   { href: "/admin/pass-types", label: "Pass Types", icon: "bx-purchase-tag-alt", module: "pass_types" },
   { href: "/admin/promo-codes", label: "Promo Codes", icon: "bx-gift", module: "promo_codes" },
   { href: "/admin/companies", label: "Companies", icon: "bx-buildings", module: "companies" },

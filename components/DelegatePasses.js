@@ -1,7 +1,6 @@
 "use client";
 
 import PassCard from "@/components/registration/PassCard";
-import { visitorFeatures, visitorMoreFeatures } from "@/lib/passFeatures";
 
 export default function DelegatePasses({ passTypes = [] }) {
   return (
@@ -17,36 +16,30 @@ export default function DelegatePasses({ passTypes = [] }) {
 
       <div className="container-xxl">
         <div className="row">
-          {passTypes.map((passType) => (
-            <div className="col-lg-3 col-md-6 col-sm-6 col-12" key={passType.slug}>
-              <PassCard
-                modifierClass={passType.badgeClass}
-                title={passType.name}
-                price={passType.price}
-                ctaHref={`/register-now/${passType.slug}`}
-                baseFeatures={passType.baseFeatures}
-                moreFeatures={passType.moreFeatures}
-              />
-            </div>
-          ))}
-
-          <div className="col-lg-3 col-md-6 col-sm-6 col-12">
-            <PassCard
-              modifierClass="delegate-pass-visitor"
-              badgeIcon={
-                <div className="delegate-pass-badge-icon">
-                  <img src="/images/delegate-visitor-pass-icon.png" alt="Visitor Pass Free" />
-                </div>
-              }
-              title="Visitor Pass"
-              price="Free"
-              ctaLabel="Register Now"
-              ctaHref="/visitor-registration"
-              moreLabel="Features Not Included + "
-              baseFeatures={visitorFeatures}
-              moreFeatures={visitorMoreFeatures}
-            />
-          </div>
+          {passTypes.map((passType) => {
+            const isVisitor = passType.badgeClass === "delegate-pass-visitor";
+            return (
+              <div className="col-lg-3 col-md-6 col-sm-6 col-12" key={passType.slug}>
+                <PassCard
+                  modifierClass={passType.badgeClass}
+                  badgeIcon={
+                    isVisitor ? (
+                      <div className="delegate-pass-badge-icon">
+                        <img src="/images/delegate-visitor-pass-icon.png" alt={`${passType.name} Free`} />
+                      </div>
+                    ) : undefined
+                  }
+                  title={passType.name}
+                  price={isVisitor ? "Free" : passType.price}
+                  ctaLabel={isVisitor ? "Register Now" : "Get Your Pass"}
+                  ctaHref={isVisitor ? "/visitor-registration" : `/register-now/${passType.slug}`}
+                  moreLabel={isVisitor ? "Features Not Included + " : "View all features + "}
+                  baseFeatures={passType.baseFeatures}
+                  moreFeatures={passType.moreFeatures}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 

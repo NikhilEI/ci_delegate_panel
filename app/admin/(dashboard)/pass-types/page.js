@@ -13,6 +13,7 @@ const badgeOptions = [
   { value: "delegate-pass-platinum", label: "Platinum (purple)" },
   { value: "delegate-pass-gold", label: "Gold (amber)" },
   { value: "delegate-pass-silver", label: "Silver (grey)" },
+  { value: "delegate-pass-visitor", label: "Visitor (free)" },
 ];
 
 const slugPattern = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -178,7 +179,7 @@ export default function AdminPassTypesPage() {
                         <td className="text-muted text-truncate" style={{ maxWidth: 160, fontSize: 12.5 }} title={row.slug}>
                           {row.slug}
                         </td>
-                        <td className="fw-semibold">₹{row.price.toLocaleString("en-IN")}</td>
+                        <td className="fw-semibold">{row.badgeClass === "delegate-pass-visitor" ? "Free" : `₹${row.price.toLocaleString("en-IN")}`}</td>
                         <td>{row.isActive ? <span className="badge bg-label-success">Yes</span> : <span className="badge bg-label-secondary">No</span>}</td>
                         <td className="text-end">
                           <div className="btn-group btn-group-sm">
@@ -198,6 +199,31 @@ export default function AdminPassTypesPage() {
             )}
             {rows?.length === 0 && <EmptyState icon="bx-purchase-tag-alt" title="No pass types yet" subtitle="Add one on the right." />}
             {rows && rows.length > 0 && <Pagination page={currentPage} totalPages={totalPages} total={rows.length} onPageChange={setPage} label="pass types" />}
+          </div>
+
+          <div className="card">
+            <div className="card-header">
+              <h5 className="card-header-title">
+                <i className="bx bx-show"></i> Live Preview
+              </h5>
+              <span className="text-muted" style={{ fontSize: 12.5 }}>
+                Exactly how this card renders on the homepage - updates as you type.
+              </span>
+            </div>
+            <div className="card-body" style={{ background: "#f4f4f7" }}>
+              <div style={{ maxWidth: 300 }}>
+                <PassCard
+                  modifierClass={form.badgeClass}
+                  title={form.name || "Pass name"}
+                  price={form.badgeClass === "delegate-pass-visitor" ? "Free" : Number(form.price) || 0}
+                  ctaLabel={form.badgeClass === "delegate-pass-visitor" ? "Register Now" : "Get Your Pass"}
+                  ctaHref="#"
+                  disableCta
+                  baseFeatures={form.baseFeatures.split("\n").map((line) => line.trim()).filter(Boolean)}
+                  moreFeatures={form.moreFeatures.split("\n").map((line) => line.trim()).filter(Boolean)}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -240,6 +266,7 @@ export default function AdminPassTypesPage() {
                     </label>
                     <input id="pt-price" type="number" min="0" className={`form-control${fieldErrors.price ? " is-invalid" : ""}`} value={form.price} onChange={(e) => set("price", e.target.value)} />
                     {fieldErrors.price && <div className="invalid-feedback d-block">{fieldErrors.price}</div>}
+                    {form.badgeClass === "delegate-pass-visitor" && <div className="form-text">Shown as &quot;Free&quot; on the homepage regardless of this value - use 0.</div>}
                   </div>
                   <div className="col-6 mb-3">
                     <label htmlFor="pt-sort" className="form-label">
@@ -309,34 +336,6 @@ export default function AdminPassTypesPage() {
                   )}
                 </div>
               </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col-12">
-          <div className="card">
-            <div className="card-header">
-              <h5 className="card-header-title">
-                <i className="bx bx-show"></i> Live Preview
-              </h5>
-              <span className="text-muted" style={{ fontSize: 12.5 }}>
-                Exactly how this card renders on the homepage - updates as you type.
-              </span>
-            </div>
-            <div className="card-body" style={{ background: "#f4f4f7" }}>
-              <div style={{ maxWidth: 300 }}>
-                <PassCard
-                  modifierClass={form.badgeClass}
-                  title={form.name || "Pass name"}
-                  price={Number(form.price) || 0}
-                  ctaHref="#"
-                  disableCta
-                  baseFeatures={form.baseFeatures.split("\n").map((line) => line.trim()).filter(Boolean)}
-                  moreFeatures={form.moreFeatures.split("\n").map((line) => line.trim()).filter(Boolean)}
-                />
-              </div>
             </div>
           </div>
         </div>
