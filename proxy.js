@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ADMIN_COOKIE_NAME, verifyAdminSession } from "@/lib/auth";
+import { hasModule, moduleForPath } from "@/lib/permissions";
 
 // Proxy (formerly "middleware") always runs on the Node.js runtime, which is
 // what lets us use jsonwebtoken here.
@@ -23,6 +24,16 @@ export function proxy(request) {
     const loginUrl = new URL("/admin/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  const requiredModule = moduleForPath(pathname);
+  if (requiredModule && !hasModule(session, requiredModule)) {
+    if (pathname.startsWith("/api/admin")) {
+      return NextResponse.json({ success: false, message: "You don't have access to this module." }, { status: 403 });
+    }
+    const deniedUrl = new URL("/admin", request.url);
+    deniedUrl.searchParams.set("denied", requiredModule);
+    return NextResponse.redirect(deniedUrl);
   }
 
   return NextResponse.next();

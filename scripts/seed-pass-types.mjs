@@ -2,34 +2,58 @@
 // Run with:  node --env-file=.env.local scripts/seed-pass-types.js
 import mysql from "mysql2/promise";
 
+// Matches convergenceindia.org/register-now/ - every tier's card lists the
+// SAME full set of perks (a comparison view); a perk a given tier doesn't
+// get is still listed, just wrapped in "~~like this~~" so PassCard renders
+// it struck-through/greyed instead of leaving it out. The first 8 stay
+// visible by default; the rest sit behind "View all features +".
+const sharedBaseFeatures = [
+  "Access to the exhibition area",
+  "Fast-track registration",
+  "Delegate kit",
+  "Access to all conference tracks & stages",
+  "Lunch in the dining area",
+  "Access to the evening awards ceremony",
+  "Pre-event matchmaking via Expo mobile app",
+  "Post-event access to on-demand session recordings",
+];
+
+const platinumMoreFeatures = [
+  "Priority seating at conference sessions",
+  "Access to the networking night",
+  "Access to the business networking lounge",
+  "Certificate of attendance",
+  "Exclusive access to the VIP lounge",
+  "Exclusive car parking pass",
+  "Access to plenary sessions",
+  "Invitation to the inauguration ceremony",
+  "Dedicated concierge support/ Guided tour of the venue",
+  "Exclusive video feature on expo social media channels (subject to availability)",
+];
+
+const goldMoreFeatures = [
+  "Priority seating at conference sessions",
+  "Access to the networking night",
+  "Access to the business networking lounge",
+  "Certificate of attendance",
+  "~~Exclusive access to the VIP lounge~~",
+  "~~Exclusive car parking pass~~",
+  "~~Access to plenary sessions~~",
+  "~~Invitation to the inauguration ceremony~~",
+  "~~Dedicated concierge support/ Guided tour of the venue~~",
+  "~~Exclusive video feature on expo social media channels (subject to availability)~~",
+];
+
+const silverMoreFeatures = platinumMoreFeatures.map((feature) => `~~${feature}~~`);
+
 const passTypes = [
   {
     slug: "platinum-delegate-passes",
     name: "Platinum Delegate Pass",
     price: 20000,
     badgeClass: "delegate-pass-platinum",
-    baseFeatures: [
-      "Access to the exhibition area",
-      "Fast-track registration",
-      "Delegate kit",
-      "Invitation to the inauguration ceremony",
-      "Access to plenary sessions",
-      "Access to all conference tracks & stages",
-      "Priority seating at conference sessions",
-      "Dedicated concierge support/ Guided tour of the venue",
-    ],
-    moreFeatures: [
-      "Access to the evening awards ceremony",
-      "Access to the networking night",
-      "Lunch in the dining area",
-      "Access to the networking lounge",
-      "Exclusive access to the VIP lounge",
-      "Exclusive car parking pass",
-      "Pre-event matchmaking via the Expo mobile app",
-      "Exclusive video feature on expo social media channels (subject to availability)",
-      "Post-event access to on-demand session recordings",
-      "Certificate of attendance",
-    ],
+    baseFeatures: sharedBaseFeatures,
+    moreFeatures: platinumMoreFeatures,
     sortOrder: 1,
   },
   {
@@ -37,27 +61,8 @@ const passTypes = [
     name: "Gold Delegate Pass",
     price: 15000,
     badgeClass: "delegate-pass-gold",
-    baseFeatures: [
-      "Access to the exhibition area",
-      "Fast-track registration",
-      "Delegate kit",
-      "Access to all conference tracks",
-      "Priority seating at conference sessions",
-      "Access to the networking night",
-      "Access to the business networking lounge",
-      "Access to the evening awards ceremony",
-      "Pre-event matchmaking via the Expo mobile app",
-    ],
-    moreFeatures: [
-      "Lunch in the dining area",
-      "Post-event access to on-demand session recordings",
-      "Priority Venue Registration",
-      "Access to the networking lounge",
-      "Exclusive access to the VIP lounge",
-      "Exclusive car parking pass",
-      "Exclusive video feature on expo social media channels (subject to availability)",
-      "Certificate of attendance",
-    ],
+    baseFeatures: sharedBaseFeatures,
+    moreFeatures: goldMoreFeatures,
     sortOrder: 2,
   },
   {
@@ -65,8 +70,8 @@ const passTypes = [
     name: "Silver Delegate Pass",
     price: 10000,
     badgeClass: "delegate-pass-silver",
-    baseFeatures: ["Access to the exhibition area", "Fast-track registration", "Delegate kit", "Invitation to the inauguration ceremony", "Access to plenary sessions"],
-    moreFeatures: ["Access to all conference tracks & stages", "Priority seating at conference sessions", "Dedicated concierge support/ Guided tour of the venue"],
+    baseFeatures: sharedBaseFeatures,
+    moreFeatures: silverMoreFeatures,
     sortOrder: 3,
   },
 ];

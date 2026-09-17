@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import PageHeader from "@/components/admin/PageHeader";
 import LoadingState from "@/components/admin/LoadingState";
 import EmptyState from "@/components/admin/EmptyState";
+import Pagination from "@/components/admin/Pagination";
 
 const codePattern = /^[A-Z0-9_-]{3,30}$/;
+const PAGE_SIZE = 10;
 
 function emptyForm() {
   return {
@@ -63,6 +65,7 @@ function statusLabel(row) {
 
 export default function AdminPromoCodesPage() {
   const [rows, setRows] = useState(null);
+  const [page, setPage] = useState(1);
   const [passTypes, setPassTypes] = useState([]);
   const [loadError, setLoadError] = useState("");
   const [form, setForm] = useState(emptyForm());
@@ -88,6 +91,10 @@ export default function AdminPromoCodesPage() {
   }
 
   useEffect(load, []);
+
+  const totalPages = Math.max(1, Math.ceil((rows?.length || 0) / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pagedRows = rows ? rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) : rows;
 
   function set(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -177,7 +184,7 @@ export default function AdminPromoCodesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((row) => {
+                    {pagedRows.map((row) => {
                       const status = statusLabel(row);
                       return (
                         <tr key={row.id}>
@@ -209,6 +216,7 @@ export default function AdminPromoCodesPage() {
               </div>
             )}
             {rows?.length === 0 && <EmptyState icon="bx-gift" title="No promo codes yet" subtitle="Add one on the right." />}
+            {rows && rows.length > 0 && <Pagination page={currentPage} totalPages={totalPages} total={rows.length} onPageChange={setPage} label="promo codes" />}
           </div>
         </div>
 

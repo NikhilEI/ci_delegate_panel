@@ -6,6 +6,7 @@ import PageHeader from "@/components/admin/PageHeader";
 import StatusBadge from "@/components/admin/StatusBadge";
 import LoadingState from "@/components/admin/LoadingState";
 import EmptyState from "@/components/admin/EmptyState";
+import Pagination from "@/components/admin/Pagination";
 
 function formatCurrency(amount) {
   return "₹" + Number(amount || 0).toLocaleString("en-IN");
@@ -122,21 +123,7 @@ export default function AdminRegistrationsPage() {
             </div>
             {rows.length === 0 && <EmptyState icon="bx-id-card" title="No registrations found" subtitle="Try a different search or filter." />}
 
-            {rows.length > 0 && (
-              <div className="card-footer d-flex justify-content-between align-items-center">
-                <span className="text-muted" style={{ fontSize: 13 }}>
-                  Page {page} of {totalPages} · {total} total
-                </span>
-                <div className="btn-group">
-                  <button className="btn btn-outline-secondary btn-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-                    <i className="bx bx-chevron-left"></i> Previous
-                  </button>
-                  <button className="btn btn-outline-secondary btn-sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-                    Next <i className="bx bx-chevron-right"></i>
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} label="registrations" />
           </>
         )}
       </div>

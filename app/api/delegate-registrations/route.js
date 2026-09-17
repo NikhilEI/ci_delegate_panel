@@ -1,6 +1,7 @@
 import { getPool, query } from "@/lib/db";
 import { getRazorpay } from "@/lib/razorpay";
 import { checkPromoCode } from "@/lib/promoCodes";
+import { resolveCompanyId } from "@/lib/companies";
 
 const titlePattern = /^.{1,10}$/;
 const emailPattern = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
@@ -73,17 +74,29 @@ export async function POST(request) {
   try {
     connection = await pool.getConnection();
     await connection.beginTransaction();
+    const runInTx = async (sql, params) => (await connection.execute(sql, params))[0];
+
+    const companyId = await resolveCompanyId(runInTx, {
+      name: company.organisation,
+      address: company.address,
+      city: company.city,
+      state: company.state,
+      country: company.country,
+      zipcode: company.zipcode,
+      gstNumber: company.gstNumber,
+    });
 
     const [registrationResult] = await connection.execute(
       `INSERT INTO delegate_registrations
-        (pass_name, price_per_delegate, quantity, total_amount, organisation, address, city, state, country, zipcode, gst_number, track_of_interest, promo_code, discount_amount, terms_accepted)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        (pass_name, price_per_delegate, quantity, total_amount, organisation, company_id, address, city, state, country, zipcode, gst_number, track_of_interest, promo_code, discount_amount, terms_accepted)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
       [
         passType.name,
         passType.price,
         quantity,
         totalAmount,
         company.organisation,
+        companyId,
         company.address,
         company.city,
         company.state,

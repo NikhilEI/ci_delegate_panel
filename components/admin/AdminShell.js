@@ -5,7 +5,7 @@ import AdminSidebar from "./AdminSidebar";
 import AdminNavbar from "./AdminNavbar";
 import AdminFooter from "./AdminFooter";
 
-export default function AdminShell({ adminName, adminEmail, children }) {
+export default function AdminShell({ adminName, adminEmail, adminRole, adminPermissions, children }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -33,7 +33,7 @@ export default function AdminShell({ adminName, adminEmail, children }) {
   return (
     <div className={wrapperClass}>
       <div className="layout-container">
-        <AdminSidebar onNavigate={() => setMobileOpen(false)} collapsed={collapsed} />
+        <AdminSidebar onNavigate={() => setMobileOpen(false)} collapsed={collapsed} adminRole={adminRole} adminPermissions={adminPermissions} />
 
         <div className="layout-page">
           <AdminNavbar

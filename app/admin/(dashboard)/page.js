@@ -70,6 +70,16 @@ function RegistrationsChart({ timeseries }) {
 export default function AdminDashboardPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  // Lazy initializer instead of reading this in an effect + setState, since
+  // it only needs to run once at mount and this avoids a same-effect
+  // cascading render. Plain browser API instead of useSearchParams so this
+  // page doesn't need a Suspense boundary just for a one-off notice.
+  const [deniedModule, setDeniedModule] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const denied = new URLSearchParams(window.location.search).get("denied");
+    if (denied) window.history.replaceState(null, "", "/admin");
+    return denied || "";
+  });
 
   useEffect(() => {
     fetch("/api/admin/stats")
@@ -94,6 +104,12 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
+      {deniedModule && (
+        <div className="alert alert-warning alert-dismissible" role="alert">
+          You don&apos;t have access to that module. Ask a super admin to grant it in Admin Users if you need it.
+          <button type="button" className="btn-close" onClick={() => setDeniedModule("")}></button>
+        </div>
+      )}
       <PageHeader icon="bx-pie-chart-alt-2" title="Dashboard" subtitle="A live snapshot of delegate and visitor registrations." />
 
       <div className="row">
@@ -201,8 +217,8 @@ export default function AdminDashboardPage() {
               <h5 className="card-header-title">
                 <i className="bx bx-user-check"></i> Recent Visitors
               </h5>
-              <Link href="/admin/visitors" className="btn btn-sm btn-outline-secondary">
-                View all
+              <Link href="/admin/companies" className="btn btn-sm btn-outline-secondary">
+                View companies
               </Link>
             </div>
             <div className="table-responsive">

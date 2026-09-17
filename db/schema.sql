@@ -164,3 +164,65 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ALTER TABLE delegate_registrations
   ADD COLUMN IF NOT EXISTS promo_code VARCHAR(30) NULL AFTER track_of_interest,
   ADD COLUMN IF NOT EXISTS discount_amount INT UNSIGNED NOT NULL DEFAULT 0 AFTER promo_code;
+
+-- ---------------------------------------------------------------------------
+-- Badge generation: one badge per attendee - each delegate person, and each
+-- visitor - with a unique scannable badge_id (e.g. PLT000045, VIS000123).
+-- Scanning the badge's QR opens /admin/checkin/<badge_id>, which stamps
+-- checked_in_at the first time it's opened (idempotent after that).
+-- ---------------------------------------------------------------------------
+ALTER TABLE delegate_registration_persons
+  ADD COLUMN IF NOT EXISTS badge_id VARCHAR(20) NULL AFTER mobile,
+  ADD COLUMN IF NOT EXISTS badge_generated_at TIMESTAMP NULL AFTER badge_id,
+  ADD COLUMN IF NOT EXISTS checked_in_at TIMESTAMP NULL AFTER badge_generated_at,
+  ADD UNIQUE KEY IF NOT EXISTS uniq_delegate_person_badge (badge_id);
+
+ALTER TABLE visitor_registrations
+  ADD COLUMN IF NOT EXISTS badge_id VARCHAR(20) NULL AFTER email_verified,
+  ADD COLUMN IF NOT EXISTS badge_generated_at TIMESTAMP NULL AFTER badge_id,
+  ADD COLUMN IF NOT EXISTS checked_in_at TIMESTAMP NULL AFTER badge_generated_at,
+  ADD UNIQUE KEY IF NOT EXISTS uniq_visitor_badge (badge_id);
+
+-- ---------------------------------------------------------------------------
+-- Admin roles & per-module permissions. `role` is a convenience label/preset
+-- (super_admin/sales/operations/custom) used to pre-check a sensible default
+-- set of modules when creating a user in /admin/users; enforcement (in
+-- proxy.js) always reads the explicit `permissions` array, never `role`, so
+-- an admin's access can be fully customized regardless of their role label.
+-- super_admin implicitly has every module regardless of what's stored here.
+-- ---------------------------------------------------------------------------
+ALTER TABLE admins
+  ADD COLUMN IF NOT EXISTS role VARCHAR(30) NOT NULL DEFAULT 'super_admin' AFTER name,
+  ADD COLUMN IF NOT EXISTS permissions JSON NULL AFTER role;
+
+-- ---------------------------------------------------------------------------
+-- Companies: a proper registry each delegate registration and each visitor
+-- is mapped to via company_id, instead of the two tables each carrying their
+-- own free-text "organisation" string (which the admin Companies page used
+-- to group by, string-matching-and-all). The `organisation` columns stay in
+-- place as a denormalized display cache - lib/companies.js keeps them in
+-- sync with the company's name at registration time - so existing reads of
+-- `.organisation` elsewhere in the app don't need to change.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS companies (
+  id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name          VARCHAR(150)  NOT NULL,
+  address       VARCHAR(255)  NULL,
+  city          VARCHAR(100)  NULL,
+  state         VARCHAR(100)  NULL,
+  country       VARCHAR(100)  NULL,
+  zipcode       VARCHAR(20)   NULL,
+  gst_number    VARCHAR(30)   NULL,
+  created_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  UNIQUE KEY uniq_company_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE delegate_registrations
+  ADD COLUMN IF NOT EXISTS company_id INT UNSIGNED NULL AFTER organisation,
+  ADD INDEX IF NOT EXISTS idx_delegate_registration_company (company_id);
+
+ALTER TABLE visitor_registrations
+  ADD COLUMN IF NOT EXISTS company_id INT UNSIGNED NULL AFTER organisation,
+  ADD INDEX IF NOT EXISTS idx_visitor_registration_company (company_id);

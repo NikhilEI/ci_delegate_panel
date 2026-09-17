@@ -5,7 +5,7 @@ export default async function AdminDashboardLayout({ children }) {
   const session = await getAdminSession();
 
   return (
-    <AdminShell adminName={session?.name} adminEmail={session?.email}>
+    <AdminShell adminName={session?.name} adminEmail={session?.email} adminRole={session?.role} adminPermissions={session?.permissions}>
       {children}
     </AdminShell>
   );

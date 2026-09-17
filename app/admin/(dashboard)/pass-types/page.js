@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import PageHeader from "@/components/admin/PageHeader";
 import LoadingState from "@/components/admin/LoadingState";
 import EmptyState from "@/components/admin/EmptyState";
+import Pagination from "@/components/admin/Pagination";
+import PassCard from "@/components/registration/PassCard";
+
+const PAGE_SIZE = 10;
 
 const badgeOptions = [
   { value: "delegate-pass-platinum", label: "Platinum (purple)" },
@@ -56,6 +60,7 @@ function validate(form) {
 
 export default function AdminPassTypesPage() {
   const [rows, setRows] = useState(null);
+  const [page, setPage] = useState(1);
   const [loadError, setLoadError] = useState("");
   const [form, setForm] = useState(emptyForm());
   const [fieldErrors, setFieldErrors] = useState({});
@@ -73,6 +78,10 @@ export default function AdminPassTypesPage() {
   }
 
   useEffect(load, []);
+
+  const totalPages = Math.max(1, Math.ceil((rows?.length || 0) / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pagedRows = rows ? rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) : rows;
 
   function set(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -162,7 +171,7 @@ export default function AdminPassTypesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((row) => (
+                    {pagedRows.map((row) => (
                       <tr key={row.id}>
                         <td className="text-muted">{row.sortOrder}</td>
                         <td className="text-nowrap fw-semibold">{row.name}</td>
@@ -188,6 +197,7 @@ export default function AdminPassTypesPage() {
               </div>
             )}
             {rows?.length === 0 && <EmptyState icon="bx-purchase-tag-alt" title="No pass types yet" subtitle="Add one on the right." />}
+            {rows && rows.length > 0 && <Pagination page={currentPage} totalPages={totalPages} total={rows.length} onPageChange={setPage} label="pass types" />}
           </div>
         </div>
 
@@ -259,6 +269,10 @@ export default function AdminPassTypesPage() {
                   </label>
                   <textarea id="pt-base" className={`form-control${fieldErrors.baseFeatures ? " is-invalid" : ""}`} rows={5} value={form.baseFeatures} onChange={(e) => set("baseFeatures", e.target.value)} />
                   {fieldErrors.baseFeatures && <div className="invalid-feedback d-block">{fieldErrors.baseFeatures}</div>}
+                  <div className="form-text">
+                    Wrap a line in <code>~~like this~~</code> to show it greyed-out and struck-through instead - useful for listing a perk this pass
+                    doesn&apos;t include, matching convergenceindia.org&apos;s comparison-style cards.
+                  </div>
                 </div>
 
                 <div className="mb-3">
@@ -266,6 +280,9 @@ export default function AdminPassTypesPage() {
                     &quot;View all features&quot; extras (one per line, optional)
                   </label>
                   <textarea id="pt-more" className="form-control" rows={5} value={form.moreFeatures} onChange={(e) => set("moreFeatures", e.target.value)} />
+                  <div className="form-text">
+                    Same <code>~~like this~~</code> convention works here too.
+                  </div>
                 </div>
 
                 <div className="form-check form-switch mb-3">
@@ -292,6 +309,34 @@ export default function AdminPassTypesPage() {
                   )}
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-12">
+          <div className="card">
+            <div className="card-header">
+              <h5 className="card-header-title">
+                <i className="bx bx-show"></i> Live Preview
+              </h5>
+              <span className="text-muted" style={{ fontSize: 12.5 }}>
+                Exactly how this card renders on the homepage - updates as you type.
+              </span>
+            </div>
+            <div className="card-body" style={{ background: "#f4f4f7" }}>
+              <div style={{ maxWidth: 300 }}>
+                <PassCard
+                  modifierClass={form.badgeClass}
+                  title={form.name || "Pass name"}
+                  price={Number(form.price) || 0}
+                  ctaHref="#"
+                  disableCta
+                  baseFeatures={form.baseFeatures.split("\n").map((line) => line.trim()).filter(Boolean)}
+                  moreFeatures={form.moreFeatures.split("\n").map((line) => line.trim()).filter(Boolean)}
+                />
+              </div>
             </div>
           </div>
         </div>

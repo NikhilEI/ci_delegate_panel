@@ -36,6 +36,9 @@ yarn-error.log*
 # local-only credential docs
 /docs/ADMIN_CREDENTIALS.md
 
+# generated badge images (regenerable from the DB, not source)
+/public/badges/
+
 # vercel
 .vercel
 

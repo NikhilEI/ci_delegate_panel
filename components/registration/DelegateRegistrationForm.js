@@ -10,7 +10,6 @@ function emptyDelegate() {
   return { title: "", firstName: "", lastName: "", designation: "", designationOther: "", email: "", mobile: "" };
 }
 
-const GST_PATTERN = "^[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}[1-9A-Za-z]{1}Z[0-9A-Za-z]{1}$";
 const MOBILE_PATTERN = "^[6-9][0-9]{9}$";
 const PINCODE_PATTERN = "^[0-9]{4,10}$";
 const EMAIL_PATTERN = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$";
@@ -521,16 +520,10 @@ export default function DelegateRegistrationForm({ qty, price, passName, slug, p
                         type="text"
                         placeholder="Your GST Number (Optional)"
                         maxLength={15}
-                        pattern={GST_PATTERN}
-                        title="15-character GSTIN, e.g. 27ABCDE1234F1Z5"
                         className="form-control"
                         style={{ textTransform: "uppercase" }}
                         value={company.gstNumber}
-                        onChange={(event) => {
-                          clearCustomMessage(event);
-                          updateCompany("gstNumber", event.target.value.toUpperCase());
-                        }}
-                        onInvalid={withCustomMessage("Enter a valid 15-character GSTIN (e.g. 27ABCDE1234F1Z5) or leave this blank.")}
+                        onChange={(event) => updateCompany("gstNumber", event.target.value.toUpperCase())}
                       />
                     </div>
                     <div className="col-md-4 mb-4">

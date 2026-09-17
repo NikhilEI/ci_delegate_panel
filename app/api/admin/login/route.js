@@ -23,8 +23,9 @@ export async function POST(request) {
   }
 
   try {
-    const rows = await query(`SELECT id, name, email, password_hash FROM admins WHERE email = ? LIMIT 1`, [email]);
+    const rows = await query(`SELECT id, name, email, password_hash, role, permissions FROM admins WHERE email = ? LIMIT 1`, [email]);
     const admin = rows[0];
+    if (admin) admin.permissions = typeof admin.permissions === "string" ? JSON.parse(admin.permissions) : admin.permissions || [];
 
     // Always run bcrypt.compare (even against a dummy hash) so a missing
     // account doesn't respond measurably faster than a wrong password.
@@ -35,7 +36,7 @@ export async function POST(request) {
     }
 
     const token = signAdminSession(admin);
-    const response = Response.json({ success: true, admin: { name: admin.name, email: admin.email } });
+    const response = Response.json({ success: true, admin: { name: admin.name, email: admin.email, role: admin.role, permissions: admin.permissions } });
     response.headers.set(
       "Set-Cookie",
       `${ADMIN_COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 7}${process.env.NODE_ENV === "production" ? "; Secure" : ""}`

@@ -1,4 +1,5 @@
 import { query } from "@/lib/db";
+import { resolveCompanyId } from "@/lib/companies";
 
 const emailPattern = /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/;
 
@@ -43,15 +44,18 @@ export async function POST(request) {
       return badRequest("Please verify your OTP before submitting.");
     }
 
+    const companyId = await resolveCompanyId(query, { name: body.organisation });
+
     const result = await query(
       `INSERT INTO visitor_registrations
-        (title, first_name, last_name, organisation, designation, department, country, country_code, state, city, mobile, email, objective_of_visit, product_interests, terms_accepted, marketing_consent, email_verified)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 1)`,
+        (title, first_name, last_name, organisation, company_id, designation, department, country, country_code, state, city, mobile, email, objective_of_visit, product_interests, terms_accepted, marketing_consent, email_verified)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 1)`,
       [
         body.title,
         body.firstName.trim(),
         body.lastName.trim(),
         body.organisation.trim(),
+        companyId,
         body.designation === "Other" ? body.designationOther?.trim() || "Other" : body.designation,
         body.department?.trim() || null,
         body.country,

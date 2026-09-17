@@ -3,13 +3,16 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { hasModule } from "@/lib/permissions";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: "bx-pie-chart-alt-2" },
-  { href: "/admin/registrations", label: "Delegate Registrations", icon: "bx-id-card" },
-  { href: "/admin/visitors", label: "Visitor Registrations", icon: "bx-user-check" },
-  { href: "/admin/pass-types", label: "Pass Types", icon: "bx-purchase-tag-alt" },
-  { href: "/admin/promo-codes", label: "Promo Codes", icon: "bx-gift" },
+  { href: "/admin", label: "Dashboard", icon: "bx-pie-chart-alt-2", module: null },
+  { href: "/admin/registrations", label: "Delegate Registrations", icon: "bx-id-card", module: "registrations" },
+  { href: "/admin/pass-types", label: "Pass Types", icon: "bx-purchase-tag-alt", module: "pass_types" },
+  { href: "/admin/promo-codes", label: "Promo Codes", icon: "bx-gift", module: "promo_codes" },
+  { href: "/admin/companies", label: "Companies", icon: "bx-buildings", module: "companies" },
+  { href: "/admin/badges", label: "Badge Generation", icon: "bx-id-card", module: "badges" },
+  { href: "/admin/users", label: "Admin Users", icon: "bx-user-plus", module: "admin_users" },
 ];
 
 function BrandMark() {
@@ -22,8 +25,10 @@ function BrandMark() {
   );
 }
 
-export default function AdminSidebar({ onNavigate, collapsed }) {
+export default function AdminSidebar({ onNavigate, collapsed, adminRole, adminPermissions }) {
   const pathname = usePathname();
+  const session = { role: adminRole, permissions: adminPermissions };
+  const visibleItems = navItems.filter((item) => !item.module || hasModule(session, item.module));
   const menuInnerRef = useRef(null);
   const psRef = useRef(null);
 
@@ -73,7 +78,7 @@ export default function AdminSidebar({ onNavigate, collapsed }) {
       <div className="menu-inner-shadow"></div>
 
       <ul className="menu-inner py-1" ref={menuInnerRef}>
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const isActive = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
           return (
             <li className={`menu-item${isActive ? " active" : ""}`} key={item.href}>
