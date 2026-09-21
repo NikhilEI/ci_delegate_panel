@@ -17,10 +17,9 @@ function formatCurrency(amount) {
   return "INR " + amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export default function DelegateCart({ slug, modifierClass, passName, price, baseFeatures, moreFeatures, detailsHref }) {
+export default function DelegateCart({ slug, modifierClass, passName, price, baseFeatures, detailsHref }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
-  const [expanded, setExpanded] = useState(false);
 
   const subtotal = price * quantity;
   const total = subtotal;
@@ -78,16 +77,7 @@ export default function DelegateCart({ slug, modifierClass, passName, price, bas
                         {baseFeatures.map((feature, index) => (
                           <li key={`base-${index}`}>{feature}</li>
                         ))}
-                        <div style={{ display: expanded ? "block" : "none" }}>
-                          {moreFeatures.map((feature, index) => (
-                            <li key={`more-${index}`}>{feature}</li>
-                          ))}
-                        </div>
                       </ul>
-
-                      <div className="delegate-pass-footer-link" onClick={() => setExpanded((value) => !value)} style={{ cursor: "pointer" }}>
-                        {expanded ? "Show Less" : `+ ${moreFeatures.length} more`}
-                      </div>
                     </div>
                   </div>
 

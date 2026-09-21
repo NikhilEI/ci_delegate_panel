@@ -38,7 +38,6 @@ export default async function DelegatePassCartPage({ params }) {
         passName={passType.name}
         price={passType.price}
         baseFeatures={passType.baseFeatures}
-        moreFeatures={passType.moreFeatures}
         detailsHref="/register-now/delegate-registration-details"
       />
       <Footer />
