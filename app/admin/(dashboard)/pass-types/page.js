@@ -14,6 +14,8 @@ const badgeOptions = [
   { value: "delegate-pass-gold", label: "Gold (amber)" },
   { value: "delegate-pass-silver", label: "Silver (grey)" },
   { value: "delegate-pass-visitor", label: "Visitor (free)" },
+  { value: "delegate-pass-student", label: "Student (free)" },
+  { value: "delegate-pass-media", label: "Media (free)" },
 ];
 
 const slugPattern = /^[a-z0-9]+(-[a-z0-9]+)*$/;

@@ -2,6 +2,19 @@
 
 import PassCard from "@/components/registration/PassCard";
 
+function ctaHrefFor(passType) {
+  switch (passType.badgeClass) {
+    case "delegate-pass-visitor":
+      return "/visitor-registration";
+    case "delegate-pass-student":
+      return "https://www.convergenceindia.org/student-registration.aspx";
+    case "delegate-pass-media":
+      return "https://www.convergenceindia.org/press-registration.aspx";
+    default:
+      return `/register-now/${passType.slug}`;
+  }
+}
+
 export default function DelegatePasses({ passTypes = [] }) {
   return (
     <section className="section-padding section-delegate-pass">
@@ -32,7 +45,7 @@ export default function DelegatePasses({ passTypes = [] }) {
                   title={passType.name}
                   price={isVisitor ? "Free" : passType.price}
                   ctaLabel={isVisitor ? "Register Now" : "Get Your Pass"}
-                  ctaHref={isVisitor ? "/visitor-registration" : `/register-now/${passType.slug}`}
+                  ctaHref={ctaHrefFor(passType)}
                   moreLabel={isVisitor ? "Features Not Included + " : "View all features + "}
                   baseFeatures={passType.baseFeatures}
                   moreFeatures={passType.moreFeatures}
