@@ -27,13 +27,14 @@ export async function PATCH(request, { params }) {
   try {
     const result = await query(
       `UPDATE pass_types
-          SET slug = ?, name = ?, price = ?, badge_class = ?, base_features = ?, more_features = ?, sort_order = ?, is_active = ?
+          SET slug = ?, name = ?, price = ?, badge_class = ?, link_url = ?, base_features = ?, more_features = ?, sort_order = ?, is_active = ?
         WHERE id = ?`,
       [
         body.slug,
         body.name.trim(),
         body.price,
         body.badgeClass,
+        body.linkUrl?.trim() || null,
         JSON.stringify(body.baseFeatures),
         JSON.stringify(body.moreFeatures),
         Number.isInteger(body.sortOrder) ? body.sortOrder : 0,

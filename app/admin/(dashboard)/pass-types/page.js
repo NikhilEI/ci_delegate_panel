@@ -27,6 +27,7 @@ function emptyForm() {
     name: "",
     price: "",
     badgeClass: "delegate-pass-platinum",
+    linkUrl: "",
     baseFeatures: "",
     moreFeatures: "",
     sortOrder: "0",
@@ -41,6 +42,7 @@ function toFormState(row) {
     name: row.name,
     price: String(row.price),
     badgeClass: row.badgeClass,
+    linkUrl: row.linkUrl || "",
     baseFeatures: (row.baseFeatures || []).join("\n"),
     moreFeatures: (row.moreFeatures || []).join("\n"),
     sortOrder: String(row.sortOrder),
@@ -54,6 +56,12 @@ function validate(form) {
   if (!form.name.trim()) errors.name = "Name is required.";
   const priceNumber = Number(form.price);
   if (!Number.isInteger(priceNumber) || priceNumber < 0) errors.price = "Enter a whole number of rupees.";
+  if (form.linkUrl && form.linkUrl.trim()) {
+    const trimmed = form.linkUrl.trim();
+    if (!/^https?:\/\//i.test(trimmed) && !trimmed.startsWith("/")) {
+      errors.linkUrl = "Enter a valid URL (starting with http://, https://, or /).";
+    }
+  }
   const baseFeaturesList = form.baseFeatures.split("\n").map((line) => line.trim()).filter(Boolean);
   if (baseFeaturesList.length === 0) errors.baseFeatures = "Add at least one included feature (one per line).";
   const sortOrderNumber = Number(form.sortOrder);
@@ -102,6 +110,7 @@ export default function AdminPassTypesPage() {
       name: form.name.trim(),
       price: Number(form.price),
       badgeClass: form.badgeClass,
+      linkUrl: form.linkUrl?.trim() || null,
       baseFeatures: form.baseFeatures.split("\n").map((line) => line.trim()).filter(Boolean),
       moreFeatures: form.moreFeatures.split("\n").map((line) => line.trim()).filter(Boolean),
       sortOrder: Number(form.sortOrder),
@@ -169,6 +178,7 @@ export default function AdminPassTypesPage() {
                       <th>Name</th>
                       <th>Slug</th>
                       <th>Price</th>
+                      <th>Link Location</th>
                       <th>Active</th>
                       <th></th>
                     </tr>
@@ -178,10 +188,29 @@ export default function AdminPassTypesPage() {
                       <tr key={row.id}>
                         <td className="text-muted">{row.sortOrder}</td>
                         <td className="text-nowrap fw-semibold">{row.name}</td>
-                        <td className="text-muted text-truncate" style={{ maxWidth: 160, fontSize: 12.5 }} title={row.slug}>
+                        <td className="text-muted text-truncate" style={{ maxWidth: 140, fontSize: 12.5 }} title={row.slug}>
                           {row.slug}
                         </td>
-                        <td className="fw-semibold">{row.badgeClass === "delegate-pass-visitor" ? "Free" : `₹${row.price.toLocaleString("en-IN")}`}</td>
+                        <td className="fw-semibold">{`₹${row.price.toLocaleString("en-IN")}`}</td>
+                        <td style={{ maxWidth: 160, fontSize: 12.5 }}>
+                          {row.linkUrl ? (
+                            <a
+                              href={row.linkUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-truncate d-inline-block text-primary fw-medium"
+                              style={{ maxWidth: 150 }}
+                              title={row.linkUrl}
+                            >
+                              <i className="bx bx-link-external me-1"></i>
+                              {row.linkUrl}
+                            </a>
+                          ) : (
+                            <span className="text-muted" title={`Default: /register-now/${row.slug}`}>
+                              Default
+                            </span>
+                          )}
+                        </td>
                         <td>{row.isActive ? <span className="badge bg-label-success">Yes</span> : <span className="badge bg-label-secondary">No</span>}</td>
                         <td className="text-end">
                           <div className="btn-group btn-group-sm">
@@ -217,13 +246,19 @@ export default function AdminPassTypesPage() {
                 <PassCard
                   modifierClass={form.badgeClass}
                   title={form.name || "Pass name"}
-                  price={form.badgeClass === "delegate-pass-visitor" ? "Free" : Number(form.price) || 0}
+                  price={Number(form.price) || 0}
                   ctaLabel={form.badgeClass === "delegate-pass-visitor" ? "Register Now" : "Get Your Pass"}
-                  ctaHref="#"
+                  ctaHref={form.linkUrl || "#"}
                   disableCta
                   baseFeatures={form.baseFeatures.split("\n").map((line) => line.trim()).filter(Boolean)}
                   moreFeatures={form.moreFeatures.split("\n").map((line) => line.trim()).filter(Boolean)}
                 />
+              </div>
+              <div className="mt-3 text-muted small">
+                <strong>Button Destination:</strong>{" "}
+                <span className="font-monospace">
+                  {form.linkUrl ? form.linkUrl : form.badgeClass === "delegate-pass-visitor" ? "/visitor-registration" : `/register-now/${form.slug || "slug"}`}
+                </span>
               </div>
             </div>
           </div>
@@ -261,6 +296,25 @@ export default function AdminPassTypesPage() {
                   {fieldErrors.name && <div className="invalid-feedback d-block">{fieldErrors.name}</div>}
                 </div>
 
+                <div className="mb-3">
+                  <label htmlFor="pt-link" className="form-label d-flex justify-content-between align-items-center">
+                    <span>Link Location / Booking Form Link</span>
+                    <span className="text-muted small fw-normal">Optional</span>
+                  </label>
+                  <input
+                    id="pt-link"
+                    type="text"
+                    className={`form-control${fieldErrors.linkUrl ? " is-invalid" : ""}`}
+                    value={form.linkUrl}
+                    onChange={(e) => set("linkUrl", e.target.value)}
+                    placeholder="e.g. https://... or /visitor-registration"
+                  />
+                  {fieldErrors.linkUrl && <div className="invalid-feedback d-block">{fieldErrors.linkUrl}</div>}
+                  <div className="form-text">
+                    Form link or custom URL where attendees will book this pass. If left empty, defaults to standard registration (<code>/register-now/{form.slug || "slug"}</code>).
+                  </div>
+                </div>
+
                 <div className="row">
                   <div className="col-6 mb-3">
                     <label htmlFor="pt-price" className="form-label">
@@ -268,7 +322,6 @@ export default function AdminPassTypesPage() {
                     </label>
                     <input id="pt-price" type="number" min="0" className={`form-control${fieldErrors.price ? " is-invalid" : ""}`} value={form.price} onChange={(e) => set("price", e.target.value)} />
                     {fieldErrors.price && <div className="invalid-feedback d-block">{fieldErrors.price}</div>}
-                    {form.badgeClass === "delegate-pass-visitor" && <div className="form-text">Shown as &quot;Free&quot; on the homepage regardless of this value - use 0.</div>}
                   </div>
                   <div className="col-6 mb-3">
                     <label htmlFor="pt-sort" className="form-label">
