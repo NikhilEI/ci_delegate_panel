@@ -13,12 +13,23 @@ export function parseFeatureLine(raw) {
   return { text, excluded: false };
 }
 
-export function PassBadgeIcon() {
+export function getPassBadgeIcon(modifierClass = "") {
+  const cls = (modifierClass || "").toLowerCase();
+  if (cls.includes("media")) {
+    return "/images/Delegate-Media-Icon.png";
+  }
+  if (cls.includes("visitor")) {
+    return "/images/Delegate-Visitor-Icon.png";
+  }
+  // Default for platinum, gold, silver, etc.
+  return "/images/Delegate-Star_Icon.png";
+}
+
+export function PassBadgeIcon({ iconUrl, modifierClass, alt = "Pass icon" }) {
+  const iconSrc = iconUrl?.trim() ? iconUrl.trim() : getPassBadgeIcon(modifierClass);
   return (
     <div className="delegate-pass-badge-icon">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-      </svg>
+      <img src={iconSrc} alt={alt} />
     </div>
   );
 }
@@ -26,6 +37,7 @@ export function PassBadgeIcon() {
 export default function PassCard({
   modifierClass,
   badgeIcon,
+  iconUrl,
   title,
   price,
   ctaLabel = "Get Your Pass",
@@ -39,7 +51,7 @@ export default function PassCard({
 
   return (
     <div className={`delegate-pass-main-outer ${modifierClass || ""}`}>
-      {badgeIcon || <PassBadgeIcon />}
+      {badgeIcon || <PassBadgeIcon iconUrl={iconUrl} modifierClass={modifierClass} alt={title} />}
 
       <h2 className="delegate-pass-title">{title}</h2>
       <div className="delegate-pass-price">{typeof price === "number" ? `₹ ${price.toLocaleString("en-IN")}` : price}</div>

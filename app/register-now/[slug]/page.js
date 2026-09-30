@@ -35,6 +35,7 @@ export default async function DelegatePassCartPage({ params }) {
       <DelegateCart
         slug={passType.slug}
         modifierClass={passType.badgeClass}
+        iconUrl={passType.iconUrl}
         passName={passType.name}
         price={passType.price}
         baseFeatures={passType.baseFeatures}

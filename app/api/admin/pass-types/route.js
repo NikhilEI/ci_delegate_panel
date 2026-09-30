@@ -15,7 +15,7 @@ function validatePayload(body) {
 export async function GET() {
   try {
     const rows = await query(
-      `SELECT id, slug, name, price, badge_class AS badgeClass, link_url AS linkUrl, base_features AS baseFeatures, more_features AS moreFeatures,
+      `SELECT id, slug, name, price, badge_class AS badgeClass, link_url AS linkUrl, icon_url AS iconUrl, base_features AS baseFeatures, more_features AS moreFeatures,
               sort_order AS sortOrder, is_active AS isActive
          FROM pass_types
         ORDER BY sort_order, id`
@@ -48,14 +48,15 @@ export async function POST(request) {
 
   try {
     const result = await query(
-      `INSERT INTO pass_types (slug, name, price, badge_class, link_url, base_features, more_features, sort_order, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO pass_types (slug, name, price, badge_class, link_url, icon_url, base_features, more_features, sort_order, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         body.slug,
         body.name.trim(),
         body.price,
         body.badgeClass,
         body.linkUrl?.trim() || null,
+        body.iconUrl?.trim() || null,
         JSON.stringify(body.baseFeatures),
         JSON.stringify(body.moreFeatures),
         Number.isInteger(body.sortOrder) ? body.sortOrder : 0,

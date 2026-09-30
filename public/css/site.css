@@ -658,10 +658,13 @@ label.error, .exhibitor-profile-form-main label.error{display: none; color: #f00
 .delegate-pass-main-outer{width: 100%; height:auto; font-size: 15px; color: #000; border: 3px solid #ffffff; padding:20px; border-radius: 30px; /*box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);*/ margin-bottom:30px;}
 .delegate-pass-badge-icon {width: 60px; height: 60px; background-color: rgba(206, 200, 227, 0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin:0 auto; margin-bottom: 15px;}
 .delegate-pass-badge-icon svg {width: 28px; height: 28px; color: #f0f0f0;}
+.delegate-pass-badge-icon img {max-width: 32px; max-height: 32px; object-fit: contain; display: block;}
 
 .delegate-pass-gold .delegate-pass-badge-icon{background-color:#f1d58a;}
 .delegate-pass-silver .delegate-pass-badge-icon{background-color:#cdcdd3;}
 .delegate-pass-visitor .delegate-pass-badge-icon{background-color:#f0f0f0;}
+.delegate-pass-media .delegate-pass-badge-icon{background-color:#d4e6f1;}
+.delegate-pass-student .delegate-pass-badge-icon{background-color:#d5f5e3;}
 
 .delegate-pass-visitor .delegate-pass-cta-button{background: #999999; color: #ffffff;}
 

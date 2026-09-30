@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS pass_types (
   price           INT UNSIGNED  NOT NULL,
   badge_class     VARCHAR(60)   NOT NULL DEFAULT 'delegate-pass-platinum',
   link_url        VARCHAR(255)  NULL,
+  icon_url        VARCHAR(255)  NULL,
   base_features   JSON          NOT NULL,
   more_features   JSON          NOT NULL,
   sort_order      INT UNSIGNED  NOT NULL DEFAULT 0,
@@ -136,7 +137,8 @@ CREATE TABLE IF NOT EXISTS pass_types (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 ALTER TABLE pass_types
-  ADD COLUMN IF NOT EXISTS link_url VARCHAR(255) NULL AFTER badge_class;
+  ADD COLUMN IF NOT EXISTS link_url VARCHAR(255) NULL AFTER badge_class,
+  ADD COLUMN IF NOT EXISTS icon_url VARCHAR(255) NULL AFTER link_url;
 
 ALTER TABLE delegate_registrations
   ADD COLUMN IF NOT EXISTS payment_notes VARCHAR(500) NULL AFTER razorpay_signature,

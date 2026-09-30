@@ -5,7 +5,7 @@ import PageHeader from "@/components/admin/PageHeader";
 import LoadingState from "@/components/admin/LoadingState";
 import EmptyState from "@/components/admin/EmptyState";
 import Pagination from "@/components/admin/Pagination";
-import PassCard from "@/components/registration/PassCard";
+import PassCard, { getPassBadgeIcon } from "@/components/registration/PassCard";
 
 const PAGE_SIZE = 10;
 
@@ -28,6 +28,7 @@ function emptyForm() {
     price: "",
     badgeClass: "delegate-pass-platinum",
     linkUrl: "",
+    iconUrl: "",
     baseFeatures: "",
     moreFeatures: "",
     sortOrder: "0",
@@ -43,6 +44,7 @@ function toFormState(row) {
     price: String(row.price),
     badgeClass: row.badgeClass,
     linkUrl: row.linkUrl || "",
+    iconUrl: row.iconUrl || "",
     baseFeatures: (row.baseFeatures || []).join("\n"),
     moreFeatures: (row.moreFeatures || []).join("\n"),
     sortOrder: String(row.sortOrder),
@@ -77,6 +79,8 @@ export default function AdminPassTypesPage() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [formMessage, setFormMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploadingIcon, setUploadingIcon] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   function load() {
     fetch("/api/admin/pass-types")
@@ -98,6 +102,34 @@ export default function AdminPassTypesPage() {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
+  async function handleIconUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingIcon(true);
+    setUploadError("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/pass-types/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to upload icon.");
+      }
+      set("iconUrl", data.url);
+    } catch (err) {
+      setUploadError(err.message);
+    } finally {
+      setUploadingIcon(false);
+      e.target.value = "";
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setFormMessage("");
@@ -111,6 +143,7 @@ export default function AdminPassTypesPage() {
       price: Number(form.price),
       badgeClass: form.badgeClass,
       linkUrl: form.linkUrl?.trim() || null,
+      iconUrl: form.iconUrl?.trim() || null,
       baseFeatures: form.baseFeatures.split("\n").map((line) => line.trim()).filter(Boolean),
       moreFeatures: form.moreFeatures.split("\n").map((line) => line.trim()).filter(Boolean),
       sortOrder: Number(form.sortOrder),
@@ -175,6 +208,7 @@ export default function AdminPassTypesPage() {
                   <thead>
                     <tr>
                       <th>Order</th>
+                      <th>Icon</th>
                       <th>Name</th>
                       <th>Slug</th>
                       <th>Price</th>
@@ -187,6 +221,19 @@ export default function AdminPassTypesPage() {
                     {pagedRows.map((row) => (
                       <tr key={row.id}>
                         <td className="text-muted">{row.sortOrder}</td>
+                        <td>
+                          <div
+                            className="d-inline-flex align-items-center justify-content-center rounded-circle border bg-white shadow-sm"
+                            style={{ width: 32, height: 32 }}
+                            title={row.iconUrl ? `Custom icon: ${row.iconUrl}` : "Default icon"}
+                          >
+                            <img
+                              src={row.iconUrl?.trim() ? row.iconUrl.trim() : getPassBadgeIcon(row.badgeClass)}
+                              alt={row.name}
+                              style={{ maxWidth: 20, maxHeight: 20, objectFit: "contain" }}
+                            />
+                          </div>
+                        </td>
                         <td className="text-nowrap fw-semibold">{row.name}</td>
                         <td className="text-muted text-truncate" style={{ maxWidth: 140, fontSize: 12.5 }} title={row.slug}>
                           {row.slug}
@@ -245,6 +292,7 @@ export default function AdminPassTypesPage() {
               <div style={{ maxWidth: 300 }}>
                 <PassCard
                   modifierClass={form.badgeClass}
+                  iconUrl={form.iconUrl}
                   title={form.name || "Pass name"}
                   price={Number(form.price) || 0}
                   ctaLabel={form.badgeClass === "delegate-pass-visitor" ? "Register Now" : "Get Your Pass"}
@@ -343,6 +391,92 @@ export default function AdminPassTypesPage() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label d-flex justify-content-between align-items-center mb-1">
+                    <span>Card Icon</span>
+                    <span className="text-muted small fw-normal">Upload or select preset</span>
+                  </label>
+
+                  <div className="d-flex align-items-center gap-2 p-2 border rounded bg-light mb-2">
+                    <div
+                      className="d-flex align-items-center justify-content-center rounded-circle border shadow-sm"
+                      style={{ width: 44, height: 44, background: "#ffffff", flexShrink: 0 }}
+                    >
+                      <img
+                        src={form.iconUrl?.trim() ? form.iconUrl.trim() : getPassBadgeIcon(form.badgeClass)}
+                        alt="Icon preview"
+                        style={{ maxWidth: 26, maxHeight: 26, objectFit: "contain" }}
+                      />
+                    </div>
+                    <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                      <div className="small fw-semibold text-truncate" title={form.iconUrl || "Default"}>
+                        {form.iconUrl ? form.iconUrl : "Default Icon"}
+                      </div>
+                      <div className="text-muted" style={{ fontSize: 11.5 }}>
+                        {form.iconUrl ? "Custom icon active" : "Auto-selected from card style"}
+                      </div>
+                    </div>
+                    {form.iconUrl && (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary"
+                        onClick={() => set("iconUrl", "")}
+                        title="Reset to default"
+                      >
+                        <i className="bx bx-reset"></i>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="d-flex flex-wrap gap-2 align-items-center mb-2">
+                    <label className={`btn btn-sm btn-primary mb-0 ${uploadingIcon ? "disabled" : ""}`} style={{ cursor: "pointer" }}>
+                      <i className={`bx ${uploadingIcon ? "bx-loader-alt bx-spin" : "bx-upload"} me-1`}></i>
+                      {uploadingIcon ? "Uploading..." : "Upload New Icon"}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
+                        onChange={handleIconUpload}
+                        disabled={uploadingIcon}
+                        style={{ display: "none" }}
+                      />
+                    </label>
+
+                    <div className="btn-group btn-group-sm">
+                      <button
+                        type="button"
+                        className={`btn btn-outline-secondary ${form.iconUrl === "/images/Delegate-Star_Icon.png" ? "active fw-semibold" : ""}`}
+                        onClick={() => set("iconUrl", "/images/Delegate-Star_Icon.png")}
+                      >
+                        Star
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-outline-secondary ${form.iconUrl === "/images/Delegate-Media-Icon.png" ? "active fw-semibold" : ""}`}
+                        onClick={() => set("iconUrl", "/images/Delegate-Media-Icon.png")}
+                      >
+                        Media
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-outline-secondary ${form.iconUrl === "/images/Delegate-Visitor-Icon.png" ? "active fw-semibold" : ""}`}
+                        onClick={() => set("iconUrl", "/images/Delegate-Visitor-Icon.png")}
+                      >
+                        Visitor
+                      </button>
+                    </div>
+                  </div>
+
+                  {uploadError && <div className="text-danger small mb-1">{uploadError}</div>}
+
+                  <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="Custom image URL / path (/images/... or /uploads/...)"
+                    value={form.iconUrl}
+                    onChange={(e) => set("iconUrl", e.target.value)}
+                  />
                 </div>
 
                 <div className="mb-3">

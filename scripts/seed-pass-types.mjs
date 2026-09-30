@@ -82,6 +82,7 @@ const passTypes = [
     name: "Platinum Delegate Pass",
     price: 20000,
     badgeClass: "delegate-pass-platinum",
+    iconUrl: "/images/Delegate-Star_Icon.png",
     baseFeatures: sharedBaseFeatures,
     moreFeatures: platinumMoreFeatures,
     sortOrder: 1,
@@ -91,6 +92,7 @@ const passTypes = [
     name: "Gold Delegate Pass",
     price: 15000,
     badgeClass: "delegate-pass-gold",
+    iconUrl: "/images/Delegate-Star_Icon.png",
     baseFeatures: sharedBaseFeatures,
     moreFeatures: goldMoreFeatures,
     sortOrder: 2,
@@ -100,6 +102,7 @@ const passTypes = [
     name: "Silver Delegate Pass",
     price: 10000,
     badgeClass: "delegate-pass-silver",
+    iconUrl: "/images/Delegate-Star_Icon.png",
     baseFeatures: sharedBaseFeatures,
     moreFeatures: silverMoreFeatures,
     sortOrder: 3,
@@ -109,6 +112,7 @@ const passTypes = [
     name: "Visitor Pass",
     price: 0,
     badgeClass: "delegate-pass-visitor",
+    iconUrl: "/images/Delegate-Visitor-Icon.png",
     baseFeatures: visitorBaseFeatures,
     moreFeatures: visitorMoreFeatures,
     sortOrder: 4,
@@ -126,12 +130,13 @@ async function main() {
 
   for (const pass of passTypes) {
     await pool.execute(
-      `INSERT INTO pass_types (slug, name, price, badge_class, base_features, more_features, sort_order, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+      `INSERT INTO pass_types (slug, name, price, badge_class, icon_url, base_features, more_features, sort_order, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
        ON DUPLICATE KEY UPDATE
          name = VALUES(name), price = VALUES(price), badge_class = VALUES(badge_class),
-         base_features = VALUES(base_features), more_features = VALUES(more_features), sort_order = VALUES(sort_order)`,
-      [pass.slug, pass.name, pass.price, pass.badgeClass, JSON.stringify(pass.baseFeatures), JSON.stringify(pass.moreFeatures), pass.sortOrder]
+         icon_url = VALUES(icon_url), base_features = VALUES(base_features),
+         more_features = VALUES(more_features), sort_order = VALUES(sort_order)`,
+      [pass.slug, pass.name, pass.price, pass.badgeClass, pass.iconUrl, JSON.stringify(pass.baseFeatures), JSON.stringify(pass.moreFeatures), pass.sortOrder]
     );
     console.log(`Seeded pass type: ${pass.slug}`);
   }

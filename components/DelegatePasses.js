@@ -38,13 +38,7 @@ export default function DelegatePasses({ passTypes = [] }) {
               <div className="col-lg-3 col-md-6 col-sm-6 col-12" key={passType.slug}>
                 <PassCard
                   modifierClass={passType.badgeClass}
-                  badgeIcon={
-                    isVisitor ? (
-                      <div className="delegate-pass-badge-icon">
-                        <img src="/images/delegate-visitor-pass-icon.png" alt={`${passType.name} Free`} />
-                      </div>
-                    ) : undefined
-                  }
+                  iconUrl={passType.iconUrl}
                   title={passType.name}
                   price={passType.price ?? 0}
                   ctaLabel={isVisitor ? "Register Now" : "Get Your Pass"}

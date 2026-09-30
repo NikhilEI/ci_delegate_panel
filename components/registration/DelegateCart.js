@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { getPassBadgeIcon } from "@/components/registration/PassCard";
 
-function BadgeIcon() {
+function BadgeIcon({ iconUrl, modifierClass, passName }) {
+  const iconSrc = iconUrl?.trim() ? iconUrl.trim() : getPassBadgeIcon(modifierClass);
   return (
     <div className="delegate-pass-badge-icon">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-      </svg>
+      <img src={iconSrc} alt={passName || "Pass Icon"} />
     </div>
   );
 }
@@ -17,7 +17,7 @@ function formatCurrency(amount) {
   return "INR " + amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export default function DelegateCart({ slug, modifierClass, passName, price, baseFeatures, detailsHref }) {
+export default function DelegateCart({ slug, modifierClass, iconUrl, passName, price, baseFeatures, detailsHref }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
 
@@ -68,7 +68,7 @@ export default function DelegateCart({ slug, modifierClass, passName, price, bas
                 <div className="delegate-ticket-card">
                   <div className="delegate-ticket-card-left">
                     <div className="delegate-ticket-card-header">
-                      <BadgeIcon />
+                      <BadgeIcon iconUrl={iconUrl} modifierClass={modifierClass} passName={passName} />
                       <h2 className="delegate-pass-title">{passName}</h2>
                     </div>
 
