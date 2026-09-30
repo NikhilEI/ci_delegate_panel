@@ -25,7 +25,9 @@ export default function DelegatePasses({ passTypes = [] }) {
         <div className="row align-items-center">
           <div className="col-md-8">
             <div className="delegate-pass-left-heading">Secure Your Spot</div>
-            <div className="delegate-pass-left-para">Choose the best pass and experience the future of fintech</div>
+            <div className="delegate-pass-left-para">
+              Choose your pass and get ready to experience India’s leading technology and digital transformation platform.
+            </div>
           </div>
         </div>
       </div>
