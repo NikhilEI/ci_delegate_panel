@@ -24,7 +24,10 @@ const conferenceLinks = [
   { label: "Sessions Video Library", href: "https://www.convergenceindia.org/sessions-video-library.aspx", target: "_blank" },
 ];
 
-const specialEventLinks = [{ label: "Convergence Awards", href: "https://www.convergenceindia.org/awards/" }];
+const specialEventLinks = [
+  { label: "Convergence Awards", href: "https://www.convergenceindia.org/awards/" },
+  { label: "Fintech India Innovation Summit", href: "https://www.fintechindiaexpo.com/innovation-summit/", target: "_blank" },
+];
 
 const endorsementLinks = [
   { label: "Partners", href: "https://www.convergenceindia.org/partners.aspx" },
@@ -33,11 +36,24 @@ const endorsementLinks = [
   { label: "Media Partners", href: "https://www.convergenceindia.org/media-partners.aspx" },
 ];
 
-function MenuColumn({ heading, links }) {
+const featuredExpoLinks = [
+  { label: "AI Bharat Expo", href: "https://www.aibharatexpo.com/", target: "_blank" },
+  { label: "Bharat Future Cities Expo", href: "https://www.bharatfuturecities.com/", target: "_blank" },
+  { label: "Convergence India Expo", href: "https://www.convergenceindia.org/", target: "_blank" },
+  { label: "Data Center India Expo", href: "https://www.datacenterindiaexpo.com/", target: "_blank" },
+  { label: "Fintech India Expo", href: "https://www.fintechindiaexpo.com/", target: "_blank" },
+  { label: "IoT India Expo", href: "https://www.iotindiaexpo.com/", target: "_blank" },
+  { label: "Mobile and Smart Living", href: "https://www.mobileindiaexpo.com/", target: "_blank" },
+  { label: "Security Surveillance Expo", href: "https://www.securitysurveillanceexpo.com/", target: "_blank" },
+  { label: "Smart Mobility India Expo", href: "https://www.smartmobilityindiaexpo.com/", target: "_blank" },
+  { label: "Startup Hub Expo", href: "https://www.startuphubexpo.com/", target: "_blank" },
+];
+
+function MenuColumn({ heading, links, href = "#" }) {
   return (
     <div className="col-lg-2 col-md-3 col-sm-4 col-12">
       <div className="menu-box-main">
-        <a href="#" className="menu-heading nav-link abc">
+        <a href={href} className="menu-heading nav-link abc" target={href !== "#" ? "_blank" : undefined}>
           {heading}
         </a>
         <ul className="menu-ul-main nav flex-column">
@@ -63,8 +79,9 @@ const NavMenuPanel = forwardRef(function NavMenuPanel(_props, ref) {
             <MenuColumn heading="Exhibition" links={exhibitionLinks} />
             <MenuColumn heading="Visitor" links={visitorLinks} />
             <MenuColumn heading="Conference" links={conferenceLinks} />
-            <MenuColumn heading="Special Events" links={specialEventLinks} />
-            <MenuColumn heading="Endorsements" links={endorsementLinks} />
+            <MenuColumn heading="Special Events" links={specialEventLinks} href="https://www.convergenceindia.org/#" />
+            <MenuColumn heading="Endorsements" links={endorsementLinks} href="https://register.convergenceindia.org/#" />
+            <MenuColumn heading="Featured Expos" links={featuredExpoLinks} href="https://www.convergenceindia.org/#" />
           </div>
 
           <div className="row justify-content-between">
