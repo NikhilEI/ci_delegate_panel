@@ -103,6 +103,7 @@ const passTypes = [
     price: 10000,
     badgeClass: "delegate-pass-silver",
     iconUrl: "/images/Delegate-Star_Icon.png",
+    linkUrl: null,
     baseFeatures: sharedBaseFeatures,
     moreFeatures: silverMoreFeatures,
     sortOrder: 3,
@@ -113,9 +114,26 @@ const passTypes = [
     price: 0,
     badgeClass: "delegate-pass-visitor",
     iconUrl: "/images/Delegate-Visitor-Icon.png",
+    linkUrl: "/visitor-registration",
     baseFeatures: visitorBaseFeatures,
     moreFeatures: visitorMoreFeatures,
     sortOrder: 4,
+  },
+  {
+    slug: "media-pass",
+    name: "Media Pass",
+    price: 0,
+    badgeClass: "delegate-pass-media",
+    iconUrl: "/images/Delegate-Media-Icon.png",
+    linkUrl: "https://www.convergenceindia.org/press-registration.aspx",
+    baseFeatures: [
+      "Entry to exhibition area",
+      "Access to leading technology brands",
+      "Access to the inauguration ceremony",
+      "Valid press ID required",
+    ],
+    moreFeatures: [],
+    sortOrder: 5,
   },
 ];
 
@@ -130,13 +148,13 @@ async function main() {
 
   for (const pass of passTypes) {
     await pool.execute(
-      `INSERT INTO pass_types (slug, name, price, badge_class, icon_url, base_features, more_features, sort_order, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+      `INSERT INTO pass_types (slug, name, price, badge_class, icon_url, link_url, base_features, more_features, sort_order, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
        ON DUPLICATE KEY UPDATE
          name = VALUES(name), price = VALUES(price), badge_class = VALUES(badge_class),
-         icon_url = VALUES(icon_url), base_features = VALUES(base_features),
+         icon_url = VALUES(icon_url), link_url = VALUES(link_url), base_features = VALUES(base_features),
          more_features = VALUES(more_features), sort_order = VALUES(sort_order)`,
-      [pass.slug, pass.name, pass.price, pass.badgeClass, pass.iconUrl, JSON.stringify(pass.baseFeatures), JSON.stringify(pass.moreFeatures), pass.sortOrder]
+      [pass.slug, pass.name, pass.price, pass.badgeClass, pass.iconUrl, pass.linkUrl, JSON.stringify(pass.baseFeatures), JSON.stringify(pass.moreFeatures), pass.sortOrder]
     );
     console.log(`Seeded pass type: ${pass.slug}`);
   }

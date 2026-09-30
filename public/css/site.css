@@ -653,6 +653,8 @@ label.error, .exhibitor-profile-form-main label.error{display: none; color: #f00
 .delegate-pass-gold{background:linear-gradient(180deg,rgba(243, 229, 192, 1) 0%, rgba(255, 255, 255, 1) 100%);}
 .delegate-pass-silver{background:linear-gradient(180deg,rgba(216, 216, 221, 1) 0%, rgba(255, 255, 255, 1) 100%);}
 .delegate-pass-visitor{background:linear-gradient(180deg,rgba(251, 251, 251, 1) 0%, rgba(255, 255, 255, 1) 100%);}
+.delegate-pass-media{background:linear-gradient(180deg,rgba(216, 216, 221, 1) 0%, rgba(255, 255, 255, 1) 100%);}
+.delegate-pass-student{background:linear-gradient(180deg,rgba(225, 240, 230, 1) 0%, rgba(255, 255, 255, 1) 100%);}
 
 
 .delegate-pass-main-outer{width: 100%; height:auto; font-size: 15px; color: #000; border: 3px solid #ffffff; padding:20px; border-radius: 30px; /*box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);*/ margin-bottom:30px;}

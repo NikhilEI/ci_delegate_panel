@@ -381,16 +381,37 @@ export default function AdminPassTypesPage() {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="pt-badge" className="form-label">
-                    Card style
+                  <label htmlFor="pt-badge" className="form-label d-flex justify-content-between align-items-center mb-1">
+                    <span>Card Background Style (CSS Class)</span>
+                    <span className="text-muted small fw-normal">Preset or Custom Class</span>
                   </label>
-                  <select id="pt-badge" className="form-select" value={form.badgeClass} onChange={(e) => set("badgeClass", e.target.value)}>
+                  <select
+                    id="pt-badge"
+                    className="form-select mb-1"
+                    value={badgeOptions.some((opt) => opt.value === form.badgeClass) ? form.badgeClass : "custom"}
+                    onChange={(e) => {
+                      if (e.target.value !== "custom") {
+                        set("badgeClass", e.target.value);
+                      }
+                    }}
+                  >
                     {badgeOptions.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
                     ))}
+                    <option value="custom">Custom CSS Class...</option>
                   </select>
+                  <input
+                    type="text"
+                    className="form-control form-control-sm font-monospace"
+                    placeholder="e.g. delegate-pass-silver or custom-bg-class"
+                    value={form.badgeClass}
+                    onChange={(e) => set("badgeClass", e.target.value)}
+                  />
+                  <div className="form-text" style={{ fontSize: 11.5 }}>
+                    Controls the background gradient of the card. You can use <code>delegate-pass-silver</code>, <code>delegate-pass-media</code>, or any custom CSS class.
+                  </div>
                 </div>
 
                 <div className="mb-3">
