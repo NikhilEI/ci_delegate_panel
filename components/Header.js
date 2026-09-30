@@ -19,7 +19,7 @@ export default function Header() {
               </div>
               <div className="logo-box-sci col-lg-3 col-md-3 col-sm-3 col-3 ps-0">
                 <a className="navbar-brand" href="https://www.smartcitiesindia.com/" target="_blank">
-                  <img src="/images/smartcitiesindia-logo-colocated-2027.png" alt="Smart Cities India Expo" />
+                  <img src="/images/bharatfuturecities-logo-colocated-2027.png" alt="Bharat Future Cities Expo" />
                 </a>
               </div>
             </div>
