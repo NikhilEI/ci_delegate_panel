@@ -21,6 +21,7 @@ const conferenceLinks = [
   { label: "Speaker Registration", href: "https://www.convergenceindia.org/speaker-registration.aspx" },
   { label: "Conference Programme", href: "https://www.convergenceindia.org/conference-programme.aspx" },
   { label: "Eminent Speakers", href: "https://www.convergenceindia.org/speakers.aspx#speakers" },
+  { label: "Delegate Registration", href: "https://www.convergenceindia.org/delegate-registration-eiexpo.aspx" },
   { label: "Sessions Video Library", href: "https://www.convergenceindia.org/sessions-video-library.aspx", target: "_blank" },
 ];
 

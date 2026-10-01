@@ -42,6 +42,11 @@ export default function HeaderVisitor() {
                       </a>
                     </li>
                     <li>
+                      <a className="dropdown-item" href="https://www.convergenceindia.org/delegate-registration-eiexpo.aspx">
+                        Register as a Delegate <i className="far fa-arrow-right btn-arrow-icon"></i>
+                      </a>
+                    </li>
+                    <li>
                       <a className="dropdown-item" href="https://www.convergenceindia.org/speaker-registration.aspx">
                         Register as a Speaker <i className="far fa-arrow-right btn-arrow-icon"></i>
                       </a>
